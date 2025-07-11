@@ -5,6 +5,7 @@ plugins {
     // Add the Google services Gradle plugin
     id("com.google.gms.google-services") version "4.4.3" apply false
 
+
 }
 
 android {
@@ -83,6 +84,12 @@ dependencies {
     implementation("com.google.firebase:firebase-auth")
     implementation("com.google.firebase:firebase-firestore:25.1.4")
     implementation("com.google.firebase:firebase-storage:21.0.2")
+
+    //hilt
+    implementation("com.google.dagger:hilt-android:2.56.2")
+
+
+
 
 
 
