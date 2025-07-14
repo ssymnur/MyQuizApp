@@ -1,21 +1,21 @@
 {
   "project_info": {
-    "project_number": "381753976145",
-    "project_id": "fotografpaylasimi-967e4",
-    "storage_bucket": "fotografpaylasimi-967e4.firebasestorage.app"
+    "project_number": "694967989874",
+    "project_id": "myquizapp-7835d",
+    "storage_bucket": "myquizapp-7835d.firebasestorage.app"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:381753976145:android:73131b252b43190236df70",
+        "mobilesdk_app_id": "1:694967989874:android:5c6a4aaf4476e0e504b4eb",
         "android_client_info": {
-          "package_name": "com.example.fotografpaylasma"
+          "package_name": "com.quiz.myquizapp"
         }
       },
       "oauth_client": [],
       "api_key": [
         {
-          "current_key": "AIzaSyBCF-ja7pqbn8PoNcHgjLE8H_sjUiNraNQ"
+          "current_key": "AIzaSyBES8mX4-jwOhhL1NdD1jcunn3xUe5eAhM"
         }
       ],
       "services": {
