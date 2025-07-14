@@ -55,6 +55,9 @@ dependencies {
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
 
+    //splash screen
+    implementation("androidx.core:core-splashscreen:1.0.0")
+
     // Navigation
     val nav_version = "2.9.1"
     implementation("androidx.navigation:navigation-compose:$nav_version")
