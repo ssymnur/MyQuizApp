@@ -1,9 +1,22 @@
-<LinearLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:orientation="vertical"
+    android:gravity="center"
     android:padding="16dp">
+
+
+    <TextView
+        android:id="@+id/textViewTimer"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginTop="16dp"
+        android:text="10:00"
+        android:textColor="#2196F3"
+        android:textSize="20sp" />
+
 
     <TextView
         android:id="@+id/textViewQuestion"
@@ -51,5 +64,48 @@
         android:layout_height="wrap_content"
         android:backgroundTint="#5DADE2"
         android:text="D"/>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_marginTop="24dp"
+        android:gravity="center">
+
+        <Button
+            android:id="@+id/buttonPrevious"
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:layout_height="wrap_content"
+            android:text="Geri"
+            android:backgroundTint="#FFC1CC"
+            android:layout_marginEnd="8dp"/>
+        <Button
+            android:id="@+id/buttonFinish"
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:layout_height="wrap_content"
+            android:text="Bitir"
+            android:backgroundTint="#FFC1CC"
+            android:layout_marginStart="8dp"/>
+
+        <Button
+            android:id="@+id/buttonNext"
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:layout_height="wrap_content"
+            android:text="İleri"
+            android:backgroundTint="#FFC1CC"
+            android:layout_marginStart="8dp"/>
+
+
+    </LinearLayout>
+
+
+
+
+
+
+
 
 </LinearLayout>
