@@ -1,6 +1,5 @@
 package com.quiz.myquizapp.fragment.entry
 
-
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -9,11 +8,9 @@ import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
-import com.google.firebase.auth.FirebaseAuth
 import com.quiz.myquizapp.R
 import com.quiz.myquizapp.databinding.FragmentEntryBinding
 import dagger.hilt.android.AndroidEntryPoint
-
 
 @AndroidEntryPoint
 class EntryFragment : Fragment() {
@@ -34,10 +31,10 @@ class EntryFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        //Kayıt Ol Butonu
-       binding.buttonRegister.setOnClickListener {
+        binding.buttonRegister.setOnClickListener {
             val email = binding.editTextEmail.text.toString().trim()
             val password = binding.editTextPassword.text.toString().trim()
+
             if (email.isNotEmpty() && password.isNotEmpty()) {
                 viewModel.register(email, password)
             } else {
@@ -45,10 +42,10 @@ class EntryFragment : Fragment() {
             }
         }
 
-        //Giriş Yap Butonu
         binding.buttonLogin.setOnClickListener {
             val email = binding.editTextEmail.text.toString().trim()
             val password = binding.editTextPassword.text.toString().trim()
+
             if (email.isNotEmpty() && password.isNotEmpty()) {
                 viewModel.login(email, password)
             } else {
@@ -56,17 +53,25 @@ class EntryFragment : Fragment() {
             }
         }
 
-        // Başarılı auth işlemi sonrası yönlendirme ve mesaj
+        // Giriş/Kayıt sonucu gözlemi
         viewModel.authResult.observe(viewLifecycleOwner) { success ->
-            if (success) {
-                Toast.makeText(requireContext(), "Başarılı giriş/kayıt", Toast.LENGTH_SHORT).show()
-                findNavController().navigate(R.id.action_entryFragment_to_listFragment)
+            success?.let {
+                if (it) {
+                    Toast.makeText(requireContext(), "Başarılı giriş/kayıt", Toast.LENGTH_SHORT).show()
+                    findNavController().navigate(R.id.action_entryFragment_to_listFragment)
+                }
+                // İşlem sonrası LiveData’yı resetle
+                viewModel.resetAuthResult()
             }
         }
 
-        // Hata mesajlarını göster
+        // Hata mesajları gözlemi
         viewModel.error.observe(viewLifecycleOwner) { errorMsg ->
-            Toast.makeText(requireContext(), errorMsg, Toast.LENGTH_SHORT).show()
+            errorMsg?.let {
+                Toast.makeText(requireContext(), it, Toast.LENGTH_SHORT).show()
+                // Hata gösterildikten sonra resetle
+                viewModel.resetError()
+            }
         }
     }
 

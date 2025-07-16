@@ -5,6 +5,8 @@ plugins {
     id("org.jetbrains.kotlin.kapt")
     id("com.google.dagger.hilt.android")
     id("com.google.gms.google-services")
+    id ("androidx.navigation.safeargs.kotlin")
+
 }
 
 android {
@@ -87,6 +89,10 @@ dependencies {
 
     // Javapoet
     implementation("com.squareup:javapoet:1.13.0")
+
+    implementation ("com.github.bumptech.glide:glide:4.16.0")
+    kapt ("com.github.bumptech.glide:compiler:4.16.0")
+
 }
 
 // Transitive dependency çözümü (gerekirse)

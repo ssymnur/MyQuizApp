@@ -5,6 +5,7 @@
     android:id="@+id/nav_graph"
     app:startDestination="@id/entryFragment">
 
+    <!-- Entry Fragment -->
     <fragment
         android:id="@+id/entryFragment"
         android:name="com.quiz.myquizapp.fragment.entry.EntryFragment"
@@ -14,21 +15,29 @@
             android:id="@+id/action_entryFragment_to_listFragment"
             app:destination="@id/listFragment" />
     </fragment>
-    <fragment
-        android:id="@+id/startFragment"
-        android:name="com.quiz.myquizapp.StartFragment"
-        android:label="fragment_start"
-        tools:layout="@layout/fragment_start" />
+
+    <!-- List Fragment -->
     <fragment
         android:id="@+id/listFragment"
         android:name="com.quiz.myquizapp.ListFragment"
         android:label="fragment_list"
         tools:layout="@layout/fragment_list" >
         <action
-            android:id="@+id/action_listFragment_to_startFragment"
-            app:destination="@id/startFragment" />
-        <action
-            android:id="@+id/action_listFragment_to_entryFragment"
-            app:destination="@id/entryFragment" />
+            android:id="@+id/action_listFragment_to_questionsFragment"
+            app:destination="@id/questionsFragment" />
     </fragment>
+
+    <!-- Questions Fragment -->
+    <fragment
+        android:id="@+id/questionsFragment"
+        android:name="com.quiz.myquizapp.questions.QuestionsFragment"
+        android:label="QuestionsFragment"
+        tools:layout="@layout/fragment_questions">
+
+        <!-- Argument ekledik -->
+        <argument
+            android:name="selectedCategory"
+            app:argType="string" />
+    </fragment>
+
 </navigation>

@@ -1,7 +1,5 @@
 package com.quiz.myquizapp.di
 
-
-
 import javax.inject.Inject
 
 class CategoryRepository @Inject constructor(

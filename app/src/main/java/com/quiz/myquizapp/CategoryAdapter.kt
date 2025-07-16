@@ -5,7 +5,10 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.quiz.myquizapp.databinding.RecyclerRowBinding
 
-class CategoryAdapter(private var categoryList: List<String>) : RecyclerView.Adapter<CategoryAdapter.CategoryViewHolder>() {
+class CategoryAdapter(
+    private var categoryList: List<String> ,
+    private val onItemClick: (String) -> Unit
+    ) : RecyclerView.Adapter<CategoryAdapter.CategoryViewHolder>() {
 
     class CategoryViewHolder(val binding: RecyclerRowBinding) : RecyclerView.ViewHolder(binding.root)
 
@@ -15,7 +18,12 @@ class CategoryAdapter(private var categoryList: List<String>) : RecyclerView.Ada
     }
 
     override fun onBindViewHolder(holder: CategoryViewHolder, position: Int) {
-        holder.binding.textViewCategoryName.text = categoryList[position]
+        //holder.binding.textViewCategoryName.text = categoryList[position]
+        val category = categoryList[position]
+        holder.binding.textViewCategoryName.text = category
+        holder.itemView.setOnClickListener {
+            onItemClick(category)   // Tıklamayı bildir
+        }
     }
 
     override fun getItemCount(): Int {

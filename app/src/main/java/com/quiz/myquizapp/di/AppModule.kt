@@ -1,6 +1,7 @@
 package com.quiz.myquizapp.di
 
 import com.google.firebase.auth.FirebaseAuth
+import com.quiz.myquizapp.questions.QuestionApiService
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -36,6 +37,12 @@ object AppModule {
     @Singleton
     fun provideCategoryApiService(retrofit: Retrofit): CategoryApiService {
         return retrofit.create(CategoryApiService::class.java)
+    }
+
+    @Provides
+    @Singleton
+    fun provideQuestionApiService(retrofit: Retrofit): QuestionApiService {
+        return retrofit.create(QuestionApiService::class.java)
     }
 
 
