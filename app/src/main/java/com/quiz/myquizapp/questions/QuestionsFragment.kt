@@ -1,15 +1,19 @@
 package com.quiz.myquizapp.questions
 
+import android.app.AlertDialog
 import android.os.Bundle
 import android.os.CountDownTimer
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ImageView
+import android.widget.TextView
 import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.navArgs
 import com.bumptech.glide.Glide
+import com.quiz.myquizapp.R
 import com.quiz.myquizapp.databinding.FragmentQuestionsBinding
 import dagger.hilt.android.AndroidEntryPoint
 
@@ -65,13 +69,18 @@ class QuestionsFragment : Fragment() {
             if (currentQuestionIndex < questionsList.size - 1) {
                 currentQuestionIndex++
                 displayQuestion(currentQuestionIndex)
+            }else{
+                Toast.makeText(requireContext(),"Son sorudasınız!" , Toast.LENGTH_LONG).show()
             }
+
         }
 
         binding.buttonPrevious.setOnClickListener {
             if (currentQuestionIndex > 0) {
                 currentQuestionIndex--
                 displayQuestion(currentQuestionIndex)
+            }else{
+                Toast.makeText(requireContext() , "İlk sorudasınız!" , Toast.LENGTH_SHORT).show()
             }
         }
 
@@ -120,6 +129,13 @@ class QuestionsFragment : Fragment() {
             binding.imageViewQuestion.visibility = View.GONE
         }
 
+        //progress bar
+        binding.progressBar.max = questionsList.size
+        binding.progressBar.progress = index + 1
+
+        binding.textViewQuestionProgress.text = "Soru ${index + 1} / ${questionsList.size}"
+
+
         binding.buttonOptionA.text = question.options[0]
         binding.buttonOptionB.text = question.options[1]
         binding.buttonOptionC.text = question.options[2]
@@ -157,16 +173,31 @@ class QuestionsFragment : Fragment() {
 
     private fun showResultDialog(correctCount: Int) {
         val total = questionsList.size
-        val dialog = android.app.AlertDialog.Builder(requireContext())
-            .setTitle("Quiz Tamamlandı")
-            .setMessage("Tebrikler! $total sorudan $correctCount tanesini doğru yaptınız!")
+        val inflater = LayoutInflater.from(requireContext())
+        val view = inflater.inflate(R.layout.dialog_result, null)
+
+        val imageResult = view.findViewById<ImageView>(R.id.imageResult)
+        val textResultMessage = view.findViewById<TextView>(R.id.textResultMessage)
+
+        if (correctCount >= 6) {
+            imageResult.setImageResource(R.drawable.balloon)
+            textResultMessage.text = "Tebrikler! $total sorudan $correctCount tanesini doğru cevapladınız 🎉"
+        } else {
+            imageResult.setImageResource(R.drawable.sad)
+            textResultMessage.text = "Daha iyisini yapabilirsin! $total sorudan sadece $correctCount doğru 🙁"
+        }
+
+        val dialog = AlertDialog.Builder(requireContext())
+            .setView(view)
             .setPositiveButton("Kategoriye Dön") { _, _ ->
                 requireActivity().onBackPressedDispatcher.onBackPressed()
             }
             .setCancelable(false)
             .create()
+
         dialog.show()
     }
+
 
     private fun startTimer() {
         countDownTimer = object : CountDownTimer(timeLeftInMillis, 1000) {

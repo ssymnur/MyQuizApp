@@ -4,35 +4,133 @@
     android:layout_height="match_parent"
     android:padding="24dp">
 
+
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical">
+        android:orientation="vertical"
+        android:gravity="center_horizontal">
 
-        <EditText
-            android:id="@+id/editTextEmail"
+        <!-- Logo -->
+        <ImageView
+            android:id="@+id/imageViewLogo"
+            android:layout_width="250dp"
+            android:layout_height="250dp"
+            android:src="@drawable/welcome"
+            android:layout_marginBottom="32dp"
+            android:contentDescription="App Logo" />
+
+        <!-- Login layout -->
+        <LinearLayout
+            android:id="@+id/layoutLogin"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="Email"
-            android:inputType="textEmailAddress" />
+            android:orientation="vertical">
 
-        <EditText
-            android:id="@+id/editTextPassword"
+            <EditText
+                android:id="@+id/editTextEmail"
+                android:layout_width="match_parent"
+                android:layout_height="50dp"
+                android:layout_marginBottom="16dp"
+                android:hint="Email"
+                android:padding="12dp"
+                android:inputType="textEmailAddress" />
+
+            <EditText
+                android:id="@+id/editTextPassword"
+                android:layout_width="match_parent"
+                android:layout_height="50dp"
+                android:layout_marginBottom="16dp"
+                android:hint="Şifre"
+                android:padding="12dp"
+                android:inputType="textPassword" />
+
+            <Button
+                android:id="@+id/buttonLogin"
+                android:layout_width="match_parent"
+                android:layout_height="50dp"
+                android:layout_marginBottom="12dp"
+                android:backgroundTint="#0D47A1"
+                android:textColor="#FFFFFF"
+                android:text="Giriş Yap" />
+
+            <Button
+                android:id="@+id/buttonRegister"
+                android:layout_width="match_parent"
+                android:layout_height="50dp"
+                android:backgroundTint="#0D47A1"
+                android:textColor="#FFFFFF"
+                android:text="Kayıt Ol" />
+        </LinearLayout>
+
+        <!-- Profil oluşturma layout -->
+        <LinearLayout
+            android:id="@+id/layoutProfile"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="Şifre"
-            android:inputType="textPassword" />
+            android:orientation="vertical"
+            android:gravity="center_horizontal"
+            android:visibility="gone"
+            android:paddingTop="24dp">
 
-        <Button
-            android:id="@+id/buttonLogin"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="Giriş Yap" />
+            <EditText
+                android:id="@+id/editTextNickname"
+                android:layout_width="match_parent"
+                android:layout_height="50dp"
+                android:layout_marginBottom="16dp"
+                android:hint="Nickname"
+                android:padding="12dp" />
 
-        <Button
-            android:id="@+id/buttonRegister"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="Kayıt Ol" />
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Avatar Seçin"
+                android:layout_marginBottom="8dp"
+                android:textSize="16sp"
+                android:textColor="#0D47A1" />
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center">
+
+                <ImageView
+                    android:id="@+id/avatar1"
+                    android:layout_width="64dp"
+                    android:layout_height="64dp"
+                    android:src="@drawable/avatar_male"
+                    android:layout_margin="8dp"/>
+
+                <ImageView
+                    android:id="@+id/avatar2"
+                    android:layout_width="64dp"
+                    android:layout_height="64dp"
+                    android:src="@drawable/avatar_female"
+                    android:layout_margin="8dp"/>
+
+                <ImageView
+                    android:id="@+id/avatar3"
+                    android:layout_width="64dp"
+                    android:layout_height="64dp"
+                    android:src="@drawable/avatar_female2"
+                    android:layout_margin="8dp"/>
+
+                <ImageView
+                    android:id="@+id/avatar4"
+                    android:layout_width="64dp"
+                    android:layout_height="64dp"
+                    android:src="@drawable/avatar_male2"
+                    android:layout_margin="8dp"/>
+            </LinearLayout>
+
+            <Button
+                android:id="@+id/buttonContinue"
+                android:layout_width="wrap_content"
+                android:layout_height="50dp"
+                android:layout_marginTop="16dp"
+                android:text="Devam Et"
+                android:textColor="#FFFFFF" />
+        </LinearLayout>
     </LinearLayout>
 </ScrollView>

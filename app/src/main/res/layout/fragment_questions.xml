@@ -1,111 +1,142 @@
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:orientation="vertical"
     android:gravity="center"
+    android:background="#FFF6F9"
     android:padding="16dp">
 
-
+    <!-- Timer -->
     <TextView
         android:id="@+id/textViewTimer"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:text="10:00"
+        android:textSize="18sp"
+        android:textColor="#5DADE2"
         android:layout_gravity="center_horizontal"
         android:layout_marginTop="16dp"
-        android:text="10:00"
-        android:textColor="#2196F3"
-        android:textSize="20sp" />
+        android:layout_marginBottom="8dp"/>
 
 
+    <!-- Progress Text -->
+    <TextView
+        android:id="@+id/textViewQuestionProgress"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Soru 1 / 10"
+        android:textSize="16sp"
+        android:textColor="#5DADE2"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginBottom="4dp"/>
+
+    <!-- ProgressBar -->
+    <ProgressBar
+        android:id="@+id/progressBar"
+        style="?android:attr/progressBarStyleHorizontal"
+        android:layout_width="match_parent"
+        android:layout_height="16dp"
+        android:max="100"
+        android:progress="0"
+        android:progressTint="#5DADE2"
+        android:backgroundTint="#DDDDDD"
+        android:layout_marginBottom="16dp"/>
+
+
+    <!-- Soru -->
     <TextView
         android:id="@+id/textViewQuestion"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="60dp"
         android:text="Soru burada"
-        android:textSize="18sp"
+        android:textSize="20sp"
+        android:textColor="#333333"
         android:textAlignment="center"
         android:layout_marginBottom="16dp"/>
 
+    <!-- Görsel -->
     <ImageView
         android:id="@+id/imageViewQuestion"
         android:layout_width="match_parent"
         android:layout_height="200dp"
         android:scaleType="fitCenter"
-        android:visibility="gone"
-        android:layout_marginBottom="16dp"/>
+        android:background="#FFE4E1" />
 
-
+    <!-- Seçenekler -->
     <Button
         android:id="@+id/buttonOptionA"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:backgroundTint="#5DADE2"
-        android:text="A"/>
+        android:backgroundTint="#FFC1CC"
+        android:text="A"
+        android:textColor="#ffffff"
+        android:layout_marginBottom="8dp"/>
 
     <Button
         android:id="@+id/buttonOptionB"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:backgroundTint="#5DADE2"
-        android:text="B"/>
+        android:backgroundTint="#FFC1CC"
+        android:text="B"
+        android:textColor="#ffffff"
+        android:layout_marginBottom="8dp"/>
 
     <Button
         android:id="@+id/buttonOptionC"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:backgroundTint="#5DADE2"
-        android:text="C"/>
+        android:backgroundTint="#FFC1CC"
+        android:text="C"
+        android:textColor="#ffffff"
+        android:layout_marginBottom="8dp"/>
 
     <Button
         android:id="@+id/buttonOptionD"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:backgroundTint="#5DADE2"
-        android:text="D"/>
+        android:backgroundTint="#FFC1CC"
+        android:text="D"
+        android:textColor="#ffffff"
+        android:layout_marginBottom="16dp"/>
 
+    <!-- Navigation butonları -->
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        android:layout_marginTop="24dp"
         android:gravity="center">
 
         <Button
             android:id="@+id/buttonPrevious"
             android:layout_width="0dp"
-            android:layout_weight="1"
             android:layout_height="wrap_content"
-            android:text="Geri"
-            android:backgroundTint="#FFC1CC"
-            android:layout_marginEnd="8dp"/>
+            android:layout_marginEnd="8dp"
+            android:layout_weight="1"
+            android:backgroundTint="#5DADE2"
+            android:text="Önceki"
+            android:textColor="#ffffff" />
+
         <Button
             android:id="@+id/buttonFinish"
             android:layout_width="0dp"
-            android:layout_weight="1"
             android:layout_height="wrap_content"
+            android:layout_weight="1"
             android:text="Bitir"
-            android:backgroundTint="#FFC1CC"
-            android:layout_marginStart="8dp"/>
+            android:backgroundTint="#28C76F"
+            android:textColor="#ffffff"
+            android:layout_marginEnd="8dp"/>
 
         <Button
             android:id="@+id/buttonNext"
             android:layout_width="0dp"
-            android:layout_weight="1"
             android:layout_height="wrap_content"
-            android:text="İleri"
-            android:backgroundTint="#FFC1CC"
-            android:layout_marginStart="8dp"/>
-
-
+            android:layout_weight="1"
+            android:text="Sonraki"
+            android:backgroundTint="#5DADE2"
+            android:textColor="#ffffff"/>
     </LinearLayout>
 
-
-
-
-
-
-
-
 </LinearLayout>
+
