@@ -6,6 +6,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
+import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
@@ -64,24 +65,28 @@ class EntryFragment : Fragment() {
             }
         }
 
+        // Avatar seçimi için ortak fonksiyon
+        fun selectAvatar(avatarResId: Int, selectedView: View) {
+            selectedAvatar = avatarResId
+            Toast.makeText(requireContext(), "Avatar seçildi", Toast.LENGTH_SHORT).show()
+            resetAvatarBorders()
+            selectedView.background = ContextCompat.getDrawable(requireContext(), R.drawable.avatar_selected_border)
+        }
+
         binding.avatar1.setOnClickListener {
-            selectedAvatar = R.drawable.avatar_male
-            Toast.makeText(requireContext(), "Avatar 1 seçildi", Toast.LENGTH_SHORT).show()
+            selectAvatar(R.drawable.avatar_male, binding.avatar1)
         }
 
         binding.avatar2.setOnClickListener {
-            selectedAvatar = R.drawable.avatar_female
-            Toast.makeText(requireContext(), "Avatar 2 seçildi", Toast.LENGTH_SHORT).show()
+            selectAvatar(R.drawable.avatar_female, binding.avatar2)
         }
 
         binding.avatar3.setOnClickListener {
-            selectedAvatar = R.drawable.avatar_female2
-            Toast.makeText(requireContext(), "Avatar 3 seçildi", Toast.LENGTH_SHORT).show()
+            selectAvatar(R.drawable.avatar_female2, binding.avatar3)
         }
 
         binding.avatar4.setOnClickListener {
-            selectedAvatar = R.drawable.avatar_male2
-            Toast.makeText(requireContext(), "Avatar 4 seçildi", Toast.LENGTH_SHORT).show()
+            selectAvatar(R.drawable.avatar_male2, binding.avatar4)
         }
 
         binding.buttonContinue.setOnClickListener {
@@ -135,6 +140,13 @@ class EntryFragment : Fragment() {
                 viewModel.resetError()
             }
         }
+    }
+
+    private fun resetAvatarBorders() {
+        binding.avatar1.background = ContextCompat.getDrawable(requireContext(), R.drawable.avatar_unselected_background)
+        binding.avatar2.background = ContextCompat.getDrawable(requireContext(), R.drawable.avatar_unselected_background)
+        binding.avatar3.background = ContextCompat.getDrawable(requireContext(), R.drawable.avatar_unselected_background)
+        binding.avatar4.background = ContextCompat.getDrawable(requireContext(), R.drawable.avatar_unselected_background)
     }
 
     override fun onDestroyView() {

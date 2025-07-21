@@ -8,6 +8,7 @@
     android:background="#FFF6F9"
     android:padding="16dp">
 
+
     <!-- Timer -->
     <TextView
         android:id="@+id/textViewTimer"
@@ -37,12 +38,14 @@
         android:id="@+id/progressBar"
         style="?android:attr/progressBarStyleHorizontal"
         android:layout_width="match_parent"
-        android:layout_height="16dp"
+        android:layout_height="20dp"
         android:max="100"
-        android:progress="0"
-        android:progressTint="#5DADE2"
-        android:backgroundTint="#DDDDDD"
-        android:layout_marginBottom="16dp"/>
+        android:progress="30"
+        android:scaleY="3"
+        android:progressTint="#8E24AA"
+        android:backgroundTint="#E1BEE7"
+        android:layout_marginBottom="16dp"
+        android:clipToOutline="true" />
 
 
     <!-- Soru -->
@@ -69,36 +72,36 @@
         android:id="@+id/buttonOptionA"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:backgroundTint="#FFC1CC"
         android:text="A"
-        android:textColor="#ffffff"
+        android:backgroundTint="#0D47A1"
+        android:textColor="#FFFFFF"
         android:layout_marginBottom="8dp"/>
 
     <Button
         android:id="@+id/buttonOptionB"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:backgroundTint="#FFC1CC"
         android:text="B"
-        android:textColor="#ffffff"
+        android:backgroundTint="#0D47A1"
+        android:textColor="#FFFFFF"
         android:layout_marginBottom="8dp"/>
 
     <Button
         android:id="@+id/buttonOptionC"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:backgroundTint="#FFC1CC"
         android:text="C"
-        android:textColor="#ffffff"
+        android:backgroundTint="#0D47A1"
+        android:textColor="#FFFFFF"
         android:layout_marginBottom="8dp"/>
 
     <Button
         android:id="@+id/buttonOptionD"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:backgroundTint="#FFC1CC"
         android:text="D"
-        android:textColor="#ffffff"
+        android:backgroundTint="#0D47A1"
+        android:textColor="#FFFFFF"
         android:layout_marginBottom="16dp"/>
 
     <!-- Navigation butonları -->
@@ -124,8 +127,9 @@
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:text="Bitir"
-            android:backgroundTint="#28C76F"
-            android:textColor="#ffffff"
+            android:backgroundTint="#FFC0CB"
+            android:textColor="#FFFFFF"
+
             android:layout_marginEnd="8dp"/>
 
         <Button

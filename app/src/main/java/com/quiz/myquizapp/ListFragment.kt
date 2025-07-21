@@ -11,6 +11,9 @@ import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.firestore.ListenerRegistration
+import com.google.firebase.firestore.ktx.firestore
+import com.google.firebase.ktx.Firebase
 import com.quiz.myquizapp.databinding.FragmentListBinding
 import com.quiz.myquizapp.di.ListViewModel
 import dagger.hilt.android.AndroidEntryPoint
@@ -24,6 +27,8 @@ class ListFragment : Fragment() {
     private lateinit var categoryAdapter: CategoryAdapter
     private val viewModel: ListViewModel by viewModels()
 
+    private var userDocListener: ListenerRegistration? = null  // Listener referansı
+
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -35,6 +40,32 @@ class ListFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        val userId = FirebaseAuth.getInstance().currentUser?.uid
+        if (userId != null) {
+            val userDocRef = Firebase.firestore.collection("users").document(userId)
+
+            // Belge yoksa oluştur
+            userDocRef.get().addOnSuccessListener { document ->
+                if (!document.exists()) {
+                    val initialData = hashMapOf("point" to 0, "level" to 1)
+                    userDocRef.set(initialData)
+                }
+            }
+
+            // Puan ve seviye güncellemesi için listener kaydet
+            userDocListener = userDocRef.addSnapshotListener { snapshot, e ->
+                if (e != null || snapshot == null || !snapshot.exists()) return@addSnapshotListener
+                val point = snapshot.getLong("point") ?: 0
+                val level = snapshot.getLong("level") ?: 1
+
+                // binding null değil ve fragment view hâlâ var mı kontrolü
+                if (isAdded && _binding != null) {
+                    binding.textViewStats.text = "Puan: $point  |  Seviye: $level"
+                }
+            }
+        }
+
+        // SharedPreferences'ten kullanıcı bilgilerini çekme
         val currentUser = FirebaseAuth.getInstance().currentUser
         val emailKey = currentUser?.email?.replace(".", "_") ?: "default"
         val sharedPref = requireContext().getSharedPreferences("UserProfile_$emailKey", Context.MODE_PRIVATE)
@@ -45,6 +76,7 @@ class ListFragment : Fragment() {
         binding.textViewWelcome.text = "Hoş geldin $nickname!\nHaydi şimdi soruları çözmeye başlayalım!"
         binding.imageViewAvatar.setImageResource(avatarResId)
 
+        // Kategori listesi
         binding.ListRecyclerView.layoutManager = LinearLayoutManager(requireContext())
         categoryAdapter = CategoryAdapter(listOf()) { selectedCategory ->
             val action = ListFragmentDirections.actionListFragmentToQuestionsFragment(selectedCategory)
@@ -63,7 +95,7 @@ class ListFragment : Fragment() {
             Toast.makeText(requireContext(), "Hata: $errorMsg", Toast.LENGTH_SHORT).show()
         }
 
-        // Çıkış butonu
+        // Çıkış yap butonu
         binding.buttonLogout.setOnClickListener {
             FirebaseAuth.getInstance().signOut()
             findNavController().navigate(
@@ -78,6 +110,9 @@ class ListFragment : Fragment() {
 
     override fun onDestroyView() {
         super.onDestroyView()
+        // Listener iptali, böylece view yokken callback olmaz
+        userDocListener?.remove()
+        userDocListener = null
         _binding = null
     }
 }

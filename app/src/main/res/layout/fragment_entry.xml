@@ -97,31 +97,43 @@
 
                 <ImageView
                     android:id="@+id/avatar1"
-                    android:layout_width="64dp"
-                    android:layout_height="64dp"
+                    android:layout_width="80dp"
+                    android:layout_height="80dp"
+                    android:padding="4dp"
                     android:src="@drawable/avatar_male"
-                    android:layout_margin="8dp"/>
+                    android:scaleType="centerCrop"
+                    android:background="@drawable/avatar_unselected_background"
+                    />
 
                 <ImageView
                     android:id="@+id/avatar2"
-                    android:layout_width="64dp"
-                    android:layout_height="64dp"
+                    android:layout_width="80dp"
+                    android:layout_height="80dp"
+                    android:padding="4dp"
                     android:src="@drawable/avatar_female"
-                    android:layout_margin="8dp"/>
+                    android:scaleType="centerCrop"
+                    android:background="@drawable/avatar_unselected_background"
+                    />
 
                 <ImageView
                     android:id="@+id/avatar3"
-                    android:layout_width="64dp"
-                    android:layout_height="64dp"
+                    android:layout_width="80dp"
+                    android:layout_height="80dp"
+                    android:padding="4dp"
                     android:src="@drawable/avatar_female2"
-                    android:layout_margin="8dp"/>
+                    android:scaleType="centerCrop"
+                    android:background="@drawable/avatar_unselected_background"
+                    />
 
                 <ImageView
                     android:id="@+id/avatar4"
-                    android:layout_width="64dp"
-                    android:layout_height="64dp"
+                    android:layout_width="80dp"
+                    android:layout_height="80dp"
+                    android:padding="4dp"
                     android:src="@drawable/avatar_male2"
-                    android:layout_margin="8dp"/>
+                    android:scaleType="centerCrop"
+                    android:background="@drawable/avatar_unselected_background"
+                    />
             </LinearLayout>
 
             <Button

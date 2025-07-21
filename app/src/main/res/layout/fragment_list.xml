@@ -14,12 +14,13 @@
         android:gravity="center_vertical"
         android:paddingBottom="16dp">
 
+
         <ImageView
             android:id="@+id/imageViewAvatar"
             android:layout_width="64dp"
             android:layout_height="64dp"
-            android:src="@drawable/avatar_male"
-            android:padding="4dp" />
+            android:padding="4dp"
+            android:src="@drawable/default_avatar" />
 
         <TextView
             android:id="@+id/textViewWelcome"
@@ -30,7 +31,19 @@
             android:textSize="16sp"
             android:paddingStart="12dp"
             android:textColor="#333333" />
+
     </LinearLayout>
+
+    <TextView
+        android:id="@+id/textViewStats"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Puan: 0  |  Seviye: 1"
+        android:textSize="16sp"
+        android:textStyle="bold"
+        android:textColor="#444444"
+        android:layout_marginBottom="16dp"
+        android:layout_gravity="center_horizontal" />
 
     <!-- Çıkış butonu -->
     <Button

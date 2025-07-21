@@ -11,6 +11,7 @@ import android.widget.TextView
 import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
+import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import com.bumptech.glide.Glide
 import com.quiz.myquizapp.R
@@ -106,7 +107,7 @@ class QuestionsFragment : Fragment() {
         resetOptionButtonsColor()
 
         // Seçilen butonu pembe yap
-        selectedButton.setBackgroundColor(resources.getColor(android.R.color.holo_purple))
+        selectedButton.setBackgroundColor(resources.getColor(android.R.color.holo_blue_dark))
     }
 
     private fun resetOptionButtonsColor() {
@@ -166,12 +167,67 @@ class QuestionsFragment : Fragment() {
     }
 
     private fun finishQuiz() {
-        countDownTimer.cancel()
-        val correct = calculateCorrectAnswers()
-        showResultDialog(correct)
+        if (!isAdded) return
+        val context = context ?: return
+
+        val correctAnswers = calculateCorrectAnswers()
+
+        if (correctAnswers >= 6) {
+            //Toast.makeText(context, "Tebrikler! 1 puan kazandınız.", Toast.LENGTH_SHORT).show()
+            updateUserScoreInFirestore {
+                if (!isAdded) return@updateUserScoreInFirestore
+                requireActivity().runOnUiThread {
+                    showResultDialog(correctAnswers)
+                }
+            }
+        } else {
+            showResultDialog(correctAnswers)
+        }
     }
 
+
+    private fun updateUserScoreInFirestore(onComplete: () -> Unit) {
+        val user = com.google.firebase.auth.FirebaseAuth.getInstance().currentUser
+        if (user == null) {
+            onComplete()
+            return
+        }
+
+        val db = com.google.firebase.firestore.FirebaseFirestore.getInstance()
+        val userRef = db.collection("users").document(user.uid)
+
+        db.runTransaction { transaction ->
+            val snapshot = transaction.get(userRef)
+            val currentPoint = snapshot.getLong("point") ?: 0
+            val currentLevel = snapshot.getLong("level") ?: 1
+            val newPoint = currentPoint + 1
+
+            if (newPoint >= 10) {
+                // Seviye atla ve puanı sıfırla
+                transaction.update(userRef, "level", currentLevel + 1)
+                transaction.update(userRef, "point", 0)
+            } else {
+                // Sadece puan artır
+                transaction.update(userRef, "point", newPoint)
+            }
+        }.addOnSuccessListener {
+            onComplete()
+        }.addOnFailureListener {
+            if (isAdded) {
+                Toast.makeText(requireContext(), "Puan güncellenemedi!", Toast.LENGTH_SHORT).show()
+            }
+            onComplete()
+        }
+    }
+
+
+
+
+
+
     private fun showResultDialog(correctCount: Int) {
+        if (!isAdded) return
+
         val total = questionsList.size
         val inflater = LayoutInflater.from(requireContext())
         val view = inflater.inflate(R.layout.dialog_result, null)
@@ -187,16 +243,18 @@ class QuestionsFragment : Fragment() {
             textResultMessage.text = "Daha iyisini yapabilirsin! $total sorudan sadece $correctCount doğru 🙁"
         }
 
-        val dialog = AlertDialog.Builder(requireContext())
+        AlertDialog.Builder(requireContext())
             .setView(view)
             .setPositiveButton("Kategoriye Dön") { _, _ ->
-                requireActivity().onBackPressedDispatcher.onBackPressed()
+                if (isAdded) {
+                    requireActivity().onBackPressedDispatcher.onBackPressed()
+                }
             }
             .setCancelable(false)
             .create()
-
-        dialog.show()
+            .show()
     }
+
 
 
     private fun startTimer() {
@@ -219,17 +277,9 @@ class QuestionsFragment : Fragment() {
         binding.textViewTimer.text = String.format("%02d:%02d", minutes, seconds)
     }
 
-    private fun getUrlForCategory(category: String): String {
-        return when (category) {
-            "Sanat" -> "https://raw.githubusercontent.com/ikrabu/Quiz/refs/heads/main/questions_art"
-            "Bilim" -> "https://raw.githubusercontent.com/ikrabu/Quiz/refs/heads/main/questions_science"
-            "Tarih" -> "https://raw.githubusercontent.com/ikrabu/Quiz/refs/heads/main/questions_history"
-            "Coğrafya" -> "https://raw.githubusercontent.com/ikrabu/Quiz/refs/heads/main/questions_geography"
-            "Edebiyat" -> "https://raw.githubusercontent.com/ikrabu/Quiz/refs/heads/main/questions_literature"
-            "Sinema" -> "https://raw.githubusercontent.com/ikrabu/Quiz/refs/heads/main/questions_movies"
-            "Spor" -> "https://raw.githubusercontent.com/ikrabu/Quiz/refs/heads/main/questions_sports"
-            else -> "https://raw.githubusercontent.com/ikrabu/Quiz/refs/heads/main/questions_technology"
-        }
+    private fun getUrlForCategory(categoryName: String): String {
+        val category = QuestionCategory.fromDisplayName(categoryName)
+        return category.url
     }
 
     override fun onDestroyView() {
