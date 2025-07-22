@@ -4,6 +4,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.firestore.FirebaseFirestore
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 
@@ -14,6 +15,8 @@ class EntryViewModel @Inject constructor(
 
     private val _authResult = MutableLiveData<Boolean?>()
     val authResult: LiveData<Boolean?> = _authResult
+
+    private val firestore = FirebaseFirestore.getInstance()
 
     private val _error = MutableLiveData<String?>()
     val error: LiveData<String?> = _error

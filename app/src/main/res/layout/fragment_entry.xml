@@ -73,6 +73,7 @@
             android:visibility="gone"
             android:paddingTop="24dp">
 
+
             <EditText
                 android:id="@+id/editTextNickname"
                 android:layout_width="match_parent"

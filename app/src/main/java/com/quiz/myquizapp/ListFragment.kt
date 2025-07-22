@@ -44,6 +44,25 @@ class ListFragment : Fragment() {
         if (userId != null) {
             val userDocRef = Firebase.firestore.collection("users").document(userId)
 
+            // Firestore'dan kullanıcı profil bilgilerini al
+            userDocRef.get().addOnSuccessListener { document ->
+                if (document.exists()) {
+                    val nickname = document.getString("nickname") ?: "Kullanıcı"
+                    val avatarIndex = document.getLong("avatar")?.toInt() ?: -1
+                    val avatarResId = when (avatarIndex) {
+                        0 -> R.drawable.avatar_male
+                        1 -> R.drawable.avatar_female
+                        2 -> R.drawable.avatar_female2
+                        3 -> R.drawable.avatar_male2
+                        else -> R.drawable.default_avatar
+                    }
+
+                    binding.textViewWelcome.text =
+                        "Hoş geldin $nickname!\nHaydi şimdi soruları çözmeye başlayalım!"
+                    binding.imageViewAvatar.setImageResource(avatarResId)
+                }
+            }
+
             // Belge yoksa oluştur
             userDocRef.get().addOnSuccessListener { document ->
                 if (!document.exists()) {
@@ -58,23 +77,11 @@ class ListFragment : Fragment() {
                 val point = snapshot.getLong("point") ?: 0
                 val level = snapshot.getLong("level") ?: 1
 
-                // binding null değil ve fragment view hâlâ var mı kontrolü
                 if (isAdded && _binding != null) {
                     binding.textViewStats.text = "Puan: $point  |  Seviye: $level"
                 }
             }
         }
-
-        // SharedPreferences'ten kullanıcı bilgilerini çekme
-        val currentUser = FirebaseAuth.getInstance().currentUser
-        val emailKey = currentUser?.email?.replace(".", "_") ?: "default"
-        val sharedPref = requireContext().getSharedPreferences("UserProfile_$emailKey", Context.MODE_PRIVATE)
-
-        val nickname = sharedPref.getString("nickname", "Kullanıcı")
-        val avatarResId = sharedPref.getInt("avatar", R.drawable.default_avatar)
-
-        binding.textViewWelcome.text = "Hoş geldin $nickname!\nHaydi şimdi soruları çözmeye başlayalım!"
-        binding.imageViewAvatar.setImageResource(avatarResId)
 
         // Kategori listesi
         binding.ListRecyclerView.layoutManager = LinearLayoutManager(requireContext())
@@ -107,6 +114,7 @@ class ListFragment : Fragment() {
             )
         }
     }
+
 
     override fun onDestroyView() {
         super.onDestroyView()

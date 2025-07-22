@@ -222,9 +222,6 @@ class QuestionsFragment : Fragment() {
 
 
 
-
-
-
     private fun showResultDialog(correctCount: Int) {
         if (!isAdded) return
 
