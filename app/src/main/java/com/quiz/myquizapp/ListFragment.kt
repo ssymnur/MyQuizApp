@@ -9,6 +9,7 @@ import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
+import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.ListenerRegistration
@@ -86,7 +87,7 @@ class ListFragment : Fragment() {
         // Kategori listesi
         binding.ListRecyclerView.layoutManager = LinearLayoutManager(requireContext())
         categoryAdapter = CategoryAdapter(listOf()) { selectedCategory ->
-            val action = ListFragmentDirections.actionListFragmentToQuestionsFragment(selectedCategory)
+            val action = ListFragmentDirections.actionListFragmentToQuestionsFragment(selectedCategory.name)
             findNavController().navigate(action)
         }
         binding.ListRecyclerView.adapter = categoryAdapter
@@ -95,7 +96,7 @@ class ListFragment : Fragment() {
 
         viewModel.categories.observe(viewLifecycleOwner) { list ->
             val names = list.map { it.name }
-            categoryAdapter.updateList(names)
+            categoryAdapter.updateList(list)
         }
 
         viewModel.error.observe(viewLifecycleOwner) { errorMsg ->
@@ -113,6 +114,18 @@ class ListFragment : Fragment() {
                     .build()
             )
         }
+        //Leaderboard butonu
+        binding.buttonLeaderBoard.setOnClickListener {
+            findNavController().navigate(
+                R.id.action_listFragment_to_leaderboardFragment,
+                null,
+                androidx.navigation.NavOptions.Builder()
+                    .setPopUpTo(R.id.entryFragment, inclusive = true)
+                    .build()
+            )
+
+        }
+
     }
 
 

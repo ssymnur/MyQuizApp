@@ -28,6 +28,9 @@
         <action
             android:id="@+id/action_listFragment_to_entryFragment"
             app:destination="@id/entryFragment" />
+        <action
+            android:id="@+id/action_listFragment_to_leaderboardFragment"
+            app:destination="@id/leaderboardFragment" />
     </fragment>
 
     <!-- Questions Fragment -->
@@ -41,6 +44,14 @@
         <argument
             android:name="selectedCategory"
             app:argType="string" />
+    </fragment>
+    <fragment
+        android:id="@+id/leaderboardFragment"
+        android:name="com.quiz.myquizapp.Leaderboard.LeaderboardFragment"
+        android:label="LeaderboardFragment" >
+        <action
+            android:id="@+id/action_leaderboardFragment_to_listFragment"
+            app:destination="@id/listFragment" />
     </fragment>
 
 </navigation>

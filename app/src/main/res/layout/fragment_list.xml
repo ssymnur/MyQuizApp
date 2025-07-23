@@ -54,6 +54,15 @@
         android:backgroundTint="#FF6B6B"
         android:textColor="#FFFFFF"
         android:layout_marginBottom="16dp"/>
+    <Button
+        android:id="@+id/buttonLeaderBoard"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Leader Board"
+        android:backgroundTint="#FF6B6B"
+        android:textColor="#FFFFFF"
+        android:layout_marginBottom="16dp"/>
+
 
     <!-- Kategoriler listesi -->
     <androidx.recyclerview.widget.RecyclerView
