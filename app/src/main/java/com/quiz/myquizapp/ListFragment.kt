@@ -1,6 +1,5 @@
 package com.quiz.myquizapp
 
-import android.content.Context
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -9,7 +8,6 @@ import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
-import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.ListenerRegistration
@@ -28,7 +26,7 @@ class ListFragment : Fragment() {
     private lateinit var categoryAdapter: CategoryAdapter
     private val viewModel: ListViewModel by viewModels()
 
-    private var userDocListener: ListenerRegistration? = null  // Listener referansı
+    private var userDocListener: ListenerRegistration? = null
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -45,7 +43,6 @@ class ListFragment : Fragment() {
         if (userId != null) {
             val userDocRef = Firebase.firestore.collection("users").document(userId)
 
-            // Firestore'dan kullanıcı profil bilgilerini al
             userDocRef.get().addOnSuccessListener { document ->
                 if (document.exists()) {
                     val nickname = document.getString("nickname") ?: "Kullanıcı"
@@ -64,7 +61,6 @@ class ListFragment : Fragment() {
                 }
             }
 
-            // Belge yoksa oluştur
             userDocRef.get().addOnSuccessListener { document ->
                 if (!document.exists()) {
                     val initialData = hashMapOf("point" to 0, "level" to 1)
@@ -72,19 +68,17 @@ class ListFragment : Fragment() {
                 }
             }
 
-            // Puan ve seviye güncellemesi için listener kaydet
             userDocListener = userDocRef.addSnapshotListener { snapshot, e ->
                 if (e != null || snapshot == null || !snapshot.exists()) return@addSnapshotListener
                 val point = snapshot.getLong("point") ?: 0
                 val level = snapshot.getLong("level") ?: 1
-
                 if (isAdded && _binding != null) {
                     binding.textViewStats.text = "Puan: $point  |  Seviye: $level"
                 }
             }
         }
 
-        // Kategori listesi
+        // Kategori listesi - Tek sütun
         binding.ListRecyclerView.layoutManager = LinearLayoutManager(requireContext())
         categoryAdapter = CategoryAdapter(listOf()) { selectedCategory ->
             val action = ListFragmentDirections.actionListFragmentToQuestionsFragment(selectedCategory.name)
@@ -93,9 +87,7 @@ class ListFragment : Fragment() {
         binding.ListRecyclerView.adapter = categoryAdapter
 
         viewModel.getCategories()
-
         viewModel.categories.observe(viewLifecycleOwner) { list ->
-            val names = list.map { it.name }
             categoryAdapter.updateList(list)
         }
 
@@ -103,8 +95,18 @@ class ListFragment : Fragment() {
             Toast.makeText(requireContext(), "Hata: $errorMsg", Toast.LENGTH_SHORT).show()
         }
 
-        // Çıkış yap butonu
-        binding.buttonLogout.setOnClickListener {
+        // Footer ikonlarına tıklama
+        binding.imageViewLeaderboard.setOnClickListener {
+            findNavController().navigate(
+                R.id.action_listFragment_to_leaderboardFragment,
+                null,
+                androidx.navigation.NavOptions.Builder()
+                    .setPopUpTo(R.id.entryFragment, inclusive = true)
+                    .build()
+            )
+        }
+
+        binding.imageViewLogout.setOnClickListener {
             FirebaseAuth.getInstance().signOut()
             findNavController().navigate(
                 R.id.action_listFragment_to_entryFragment,
@@ -114,24 +116,10 @@ class ListFragment : Fragment() {
                     .build()
             )
         }
-        //Leaderboard butonu
-        binding.buttonLeaderBoard.setOnClickListener {
-            findNavController().navigate(
-                R.id.action_listFragment_to_leaderboardFragment,
-                null,
-                androidx.navigation.NavOptions.Builder()
-                    .setPopUpTo(R.id.entryFragment, inclusive = true)
-                    .build()
-            )
-
-        }
-
     }
-
 
     override fun onDestroyView() {
         super.onDestroyView()
-        // Listener iptali, böylece view yokken callback olmaz
         userDocListener?.remove()
         userDocListener = null
         _binding = null

@@ -45,25 +45,6 @@
         android:layout_marginBottom="16dp"
         android:layout_gravity="center_horizontal" />
 
-    <!-- Çıkış butonu -->
-    <Button
-        android:id="@+id/buttonLogout"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="Çıkış Yap"
-        android:backgroundTint="#FF6B6B"
-        android:textColor="#FFFFFF"
-        android:layout_marginBottom="16dp"/>
-    <Button
-        android:id="@+id/buttonLeaderBoard"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="Leader Board"
-        android:backgroundTint="#FF6B6B"
-        android:textColor="#FFFFFF"
-        android:layout_marginBottom="16dp"/>
-
-
     <!-- Kategoriler listesi -->
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/ListRecyclerView"
@@ -72,5 +53,38 @@
         android:layout_weight="1"
         android:clipToPadding="false"
         android:scrollbars="vertical" />
+    <LinearLayout
+        android:id="@+id/footerLayout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:orientation="horizontal"
+        android:paddingTop="12dp"
+        android:paddingBottom="12dp"
+        android:background="#0D47A1" >
+
+        <ImageView
+            android:id="@+id/imageViewLeaderboard"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:src="@drawable/ic_star"
+            android:contentDescription="LeaderBoard"
+            android:padding="8dp"
+            android:tint="#FFFFFF" />
+
+        <View
+            android:layout_width="32dp"
+            android:layout_height="1dp"
+            android:background="@android:color/transparent" />
+
+        <ImageView
+            android:id="@+id/imageViewLogout"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:src="@drawable/ic_exit"
+            android:contentDescription="Çıkış Yap"
+            android:padding="8dp"
+            android:tint="#FFFFFF" />
+    </LinearLayout>
 
 </LinearLayout>
