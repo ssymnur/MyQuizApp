@@ -6,6 +6,7 @@ import android.os.CountDownTimer
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.animation.AnimationUtils
 import android.widget.ImageView
 import android.widget.TextView
 import android.widget.Toast
@@ -32,13 +33,11 @@ class QuestionsFragment : Fragment() {
 
     private lateinit var countDownTimer: CountDownTimer
     private var timeLeftInMillis: Long = 600_000 // 10 dakika
+    private var hasWarnedUser = false
 
     private val userAnswers = mutableMapOf<Int, String>()
 
-    override fun onCreateView(
-        inflater: LayoutInflater, container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View {
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         _binding = FragmentQuestionsBinding.inflate(inflater, container, false)
         return binding.root
     }
@@ -47,8 +46,7 @@ class QuestionsFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
         val category = args.selectedCategory
-        val url = getUrlForCategory(category)
-        viewModel.fetchQuestionsForCategory(url)
+        viewModel.fetchQuestionsForCategory(getUrlForCategory(category))
 
         viewModel.questions.observe(viewLifecycleOwner) { list ->
             if (!list.isNullOrEmpty()) {
@@ -59,36 +57,30 @@ class QuestionsFragment : Fragment() {
             }
         }
 
-        // Cevap butonları
         binding.buttonOptionA.setOnClickListener { handleAnswerClick(binding.buttonOptionA) }
         binding.buttonOptionB.setOnClickListener { handleAnswerClick(binding.buttonOptionB) }
         binding.buttonOptionC.setOnClickListener { handleAnswerClick(binding.buttonOptionC) }
         binding.buttonOptionD.setOnClickListener { handleAnswerClick(binding.buttonOptionD) }
 
-        // İleri geri
         binding.buttonNext.setOnClickListener {
             if (currentQuestionIndex < questionsList.size - 1) {
                 currentQuestionIndex++
                 displayQuestion(currentQuestionIndex)
-            }else{
-                Toast.makeText(requireContext(),"Son sorudasınız!" , Toast.LENGTH_LONG).show()
+            } else {
+                Toast.makeText(requireContext(), "Son sorudasınız!", Toast.LENGTH_LONG).show()
             }
-
         }
 
         binding.buttonPrevious.setOnClickListener {
             if (currentQuestionIndex > 0) {
                 currentQuestionIndex--
                 displayQuestion(currentQuestionIndex)
-            }else{
-                Toast.makeText(requireContext() , "İlk sorudasınız!" , Toast.LENGTH_SHORT).show()
+            } else {
+                Toast.makeText(requireContext(), "İlk sorudasınız!", Toast.LENGTH_SHORT).show()
             }
         }
 
-        // Bitir
-        binding.buttonFinish.setOnClickListener {
-            finishQuiz()
-        }
+        binding.buttonFinish.setOnClickListener { finishQuiz() }
 
         viewModel.error.observe(viewLifecycleOwner) { errorMsg ->
             Toast.makeText(requireContext(), "Hata: $errorMsg", Toast.LENGTH_SHORT).show()
@@ -103,15 +95,14 @@ class QuestionsFragment : Fragment() {
             binding.buttonOptionD -> binding.buttonOptionD.text.toString()
             else -> ""
         }
+
         userAnswers[currentQuestionIndex] = selectedOption
         resetOptionButtonsColor()
-
-        // Seçilen butonu pembe yap
         selectedButton.setBackgroundColor(resources.getColor(android.R.color.holo_blue_dark))
     }
 
     private fun resetOptionButtonsColor() {
-        val defaultColor = resources.getColor(com.google.android.material.R.color.design_default_color_primary)
+        val defaultColor = resources.getColor(R.color.lacivert)
         binding.buttonOptionA.setBackgroundColor(defaultColor)
         binding.buttonOptionB.setBackgroundColor(defaultColor)
         binding.buttonOptionC.setBackgroundColor(defaultColor)
@@ -127,26 +118,23 @@ class QuestionsFragment : Fragment() {
             binding.imageViewQuestion.visibility = View.VISIBLE
             Glide.with(requireContext()).load(question.image).into(binding.imageViewQuestion)
         } else {
-            binding.imageViewQuestion.visibility = View.GONE
+            binding.imageViewQuestion.setImageResource(R.drawable.questionmark)
+            binding.imageViewQuestion.visibility = View.VISIBLE
         }
 
-        //progress bar
         binding.progressBar.max = questionsList.size
         binding.progressBar.progress = index + 1
-
         binding.textViewQuestionProgress.text = "Soru ${index + 1} / ${questionsList.size}"
-
 
         binding.buttonOptionA.text = question.options[0]
         binding.buttonOptionB.text = question.options[1]
         binding.buttonOptionC.text = question.options[2]
         binding.buttonOptionD.text = question.options[3]
 
-        // Seçili cevabı geri getir
         val selectedAnswer = userAnswers[index]
         resetOptionButtonsColor()
-        if (selectedAnswer != null) {
-            when (selectedAnswer) {
+        selectedAnswer?.let {
+            when (it) {
                 binding.buttonOptionA.text -> binding.buttonOptionA.setBackgroundColor(resources.getColor(android.R.color.holo_purple))
                 binding.buttonOptionB.text -> binding.buttonOptionB.setBackgroundColor(resources.getColor(android.R.color.holo_purple))
                 binding.buttonOptionC.text -> binding.buttonOptionC.setBackgroundColor(resources.getColor(android.R.color.holo_purple))
@@ -156,42 +144,26 @@ class QuestionsFragment : Fragment() {
     }
 
     private fun calculateCorrectAnswers(): Int {
-        var correctCount = 0
-        for ((index, userAnswer) in userAnswers) {
-            val correctAnswer = questionsList[index].answer
-            if (userAnswer == correctAnswer) {
-                correctCount++
-            }
+        return userAnswers.count { (index, answer) ->
+            answer == questionsList[index].answer
         }
-        return correctCount
     }
 
     private fun finishQuiz() {
         if (!isAdded) return
-        val context = context ?: return
 
         val correctAnswers = calculateCorrectAnswers()
-
         if (correctAnswers >= 6) {
-            //Toast.makeText(context, "Tebrikler! 1 puan kazandınız.", Toast.LENGTH_SHORT).show()
             updateUserScoreInFirestore {
-                if (!isAdded) return@updateUserScoreInFirestore
-                requireActivity().runOnUiThread {
-                    showResultDialog(correctAnswers)
-                }
+                if (isAdded) showResultDialog(correctAnswers)
             }
         } else {
             showResultDialog(correctAnswers)
         }
     }
 
-
     private fun updateUserScoreInFirestore(onComplete: () -> Unit) {
-        val user = com.google.firebase.auth.FirebaseAuth.getInstance().currentUser
-        if (user == null) {
-            onComplete()
-            return
-        }
+        val user = com.google.firebase.auth.FirebaseAuth.getInstance().currentUser ?: return onComplete()
 
         val db = com.google.firebase.firestore.FirebaseFirestore.getInstance()
         val userRef = db.collection("users").document(user.uid)
@@ -203,31 +175,25 @@ class QuestionsFragment : Fragment() {
             val newPoint = currentPoint + 1
 
             if (newPoint >= 10) {
-                // Seviye atla ve puanı sıfırla
                 transaction.update(userRef, "level", currentLevel + 1)
                 transaction.update(userRef, "point", 0)
             } else {
-                // Sadece puan artır
                 transaction.update(userRef, "point", newPoint)
             }
-        }.addOnSuccessListener {
-            onComplete()
-        }.addOnFailureListener {
-            if (isAdded) {
-                Toast.makeText(requireContext(), "Puan güncellenemedi!", Toast.LENGTH_SHORT).show()
+        }.addOnSuccessListener { onComplete() }
+            .addOnFailureListener {
+                if (isAdded) {
+                    Toast.makeText(requireContext(), "Puan güncellenemedi!", Toast.LENGTH_SHORT).show()
+                }
+                onComplete()
             }
-            onComplete()
-        }
     }
-
-
 
     private fun showResultDialog(correctCount: Int) {
         if (!isAdded) return
 
         val total = questionsList.size
-        val inflater = LayoutInflater.from(requireContext())
-        val view = inflater.inflate(R.layout.dialog_result, null)
+        val view = LayoutInflater.from(requireContext()).inflate(R.layout.dialog_result, null)
 
         val imageResult = view.findViewById<ImageView>(R.id.imageResult)
         val textResultMessage = view.findViewById<TextView>(R.id.textResultMessage)
@@ -243,27 +209,32 @@ class QuestionsFragment : Fragment() {
         AlertDialog.Builder(requireContext())
             .setView(view)
             .setPositiveButton("Kategoriye Dön") { _, _ ->
-                if (isAdded) {
-                    requireActivity().onBackPressedDispatcher.onBackPressed()
-                }
+                requireActivity().onBackPressedDispatcher.onBackPressed()
             }
             .setCancelable(false)
             .create()
             .show()
     }
 
-
+    private fun startWarningAnimation() {
+        val blinkAnim = AnimationUtils.loadAnimation(requireContext(), R.anim.blink)
+        binding.textViewTimer.startAnimation(blinkAnim)
+    }
 
     private fun startTimer() {
         countDownTimer = object : CountDownTimer(timeLeftInMillis, 1000) {
             override fun onTick(millisUntilFinished: Long) {
                 timeLeftInMillis = millisUntilFinished
                 updateTimerText()
+
+                if (millisUntilFinished <= 300_000 && !hasWarnedUser) {
+                    hasWarnedUser = true
+                    startWarningAnimation()
+                }
             }
 
             override fun onFinish() {
-                val correct = calculateCorrectAnswers()
-                showResultDialog(correct)
+                showResultDialog(calculateCorrectAnswers())
             }
         }.start()
     }

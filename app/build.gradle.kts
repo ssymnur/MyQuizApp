@@ -48,10 +48,12 @@ android {
 dependencies {
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.appcompat)
-    implementation(libs.material)
+    //implementation(libs.material)
     implementation(libs.androidx.activity)
     implementation(libs.androidx.constraintlayout)
     implementation(libs.androidx.media3.common.ktx)
+    implementation("com.google.firebase:firebase-database-ktx:20.3.1")
+
 
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)

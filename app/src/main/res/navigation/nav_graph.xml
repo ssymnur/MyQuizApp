@@ -31,6 +31,9 @@
         <action
             android:id="@+id/action_listFragment_to_leaderboardFragment"
             app:destination="@id/leaderboardFragment" />
+        <action
+            android:id="@+id/action_listFragment_to_profileFragment"
+            app:destination="@id/profileFragment" />
     </fragment>
 
     <!-- Questions Fragment -->
@@ -51,6 +54,14 @@
         android:label="LeaderboardFragment" >
         <action
             android:id="@+id/action_leaderboardFragment_to_listFragment"
+            app:destination="@id/listFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/profileFragment"
+        android:name="com.quiz.myquizapp.ProfileFragment"
+        android:label="ProfileFragment" >
+        <action
+            android:id="@+id/action_profileFragment_to_listFragment"
             app:destination="@id/listFragment" />
     </fragment>
 

@@ -1,0 +1,125 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/layout_profile"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:padding="24dp"
+    android:orientation="vertical"
+    android:gravity="center">
+
+    <EditText
+        android:id="@+id/editTextNickname"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Yeni Nickname"
+        android:layout_marginBottom="16dp"/>
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Avatar seç:"
+        android:textSize="16sp"
+        android:layout_marginBottom="8dp"/>
+
+    <GridLayout
+        android:id="@+id/avatarGrid"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:columnCount="4"
+        android:orientation="horizontal"
+        android:layout_marginBottom="16dp"
+        android:alignmentMode="alignMargins"
+        android:rowCount="2"
+        android:useDefaultMargins="true">
+
+        <ImageView
+            android:id="@+id/avatar1"
+            android:layout_width="64dp"
+            android:layout_height="64dp"
+            android:src="@drawable/avatar_male"
+            android:layout_margin="8dp" />
+
+        <ImageView
+            android:id="@+id/avatar2"
+            android:layout_width="64dp"
+            android:layout_height="64dp"
+            android:src="@drawable/avatar_female"
+            android:layout_margin="8dp" />
+
+        <ImageView
+            android:id="@+id/avatar3"
+            android:layout_width="64dp"
+            android:layout_height="64dp"
+            android:src="@drawable/avatar_female2"
+            android:layout_margin="8dp" />
+
+        <ImageView
+            android:id="@+id/avatar4"
+            android:layout_width="64dp"
+            android:layout_height="64dp"
+            android:src="@drawable/avatar_male2"
+            android:layout_margin="8dp" />
+
+        <ImageView
+            android:id="@+id/avatar5"
+            android:layout_width="64dp"
+            android:layout_height="64dp"
+            android:src="@drawable/avatar_male3"
+            android:layout_margin="8dp" />
+
+        <ImageView
+            android:id="@+id/avatar6"
+            android:layout_width="64dp"
+            android:layout_height="64dp"
+            android:src="@drawable/avatar_female3"
+            android:layout_margin="8dp" />
+
+        <ImageView
+            android:id="@+id/avatar7"
+            android:layout_width="64dp"
+            android:layout_height="64dp"
+            android:src="@drawable/avatar_female4"
+            android:layout_margin="8dp" />
+
+        <ImageView
+            android:id="@+id/avatar8"
+            android:layout_width="64dp"
+            android:layout_height="64dp"
+            android:src="@drawable/avatar_male4"
+            android:layout_margin="8dp" />
+        <ImageView
+            android:id="@+id/avatar9"
+            android:layout_width="64dp"
+            android:layout_height="64dp"
+            android:src="@drawable/fruit_icons2"
+            android:layout_margin="8dp" />
+
+        <ImageView
+            android:id="@+id/avatar10"
+            android:layout_width="64dp"
+            android:layout_height="64dp"
+            android:src="@drawable/fruit_icons3"
+            android:layout_margin="8dp" />
+
+        <ImageView
+            android:id="@+id/avatar11"
+            android:layout_width="64dp"
+            android:layout_height="64dp"
+            android:src="@drawable/fruit_icons4"
+            android:layout_margin="8dp" />
+
+        <ImageView
+            android:id="@+id/avatar12"
+            android:layout_width="64dp"
+            android:layout_height="64dp"
+            android:src="@drawable/fruit_icons"
+            android:layout_margin="8dp" />
+
+
+    </GridLayout>
+
+    <Button
+        android:id="@+id/buttonSave"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Kaydet"/>
+</LinearLayout>

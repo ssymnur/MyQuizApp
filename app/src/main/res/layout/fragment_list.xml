@@ -85,6 +85,19 @@
             android:contentDescription="Çıkış Yap"
             android:padding="8dp"
             android:tint="#FFFFFF" />
+        <View
+            android:layout_width="32dp"
+            android:layout_height="1dp"
+            android:background="@android:color/transparent" />
+
+        <ImageView
+            android:id="@+id/imageViewProfile"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:src="@drawable/ic_profile"
+            android:contentDescription="Profil"
+            android:padding="8dp"
+            android:tint="#FFFFFF" />
     </LinearLayout>
 
 </LinearLayout>

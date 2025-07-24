@@ -2,6 +2,7 @@ package com.quiz.myquizapp
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import android.view.animation.AnimationUtils
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.quiz.myquizapp.databinding.RecyclerRowBinding
@@ -28,8 +29,15 @@ class CategoryAdapter(
             .centerCrop()
             .into(holder.binding.imageViewBackground)
 
+        // Animasyonlu tıklama
         holder.itemView.setOnClickListener {
-            onItemClick(category)
+            val scaleAnim = AnimationUtils.loadAnimation(holder.itemView.context, R.anim.click_scale)
+            holder.itemView.startAnimation(scaleAnim)
+
+            // Animasyon sonrası yönlendirme
+            holder.itemView.postDelayed({
+                onItemClick(category)
+            }, 100) // Animasyon süresi kadar beklet
         }
     }
 

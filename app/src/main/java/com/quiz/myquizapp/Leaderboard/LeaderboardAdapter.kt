@@ -36,6 +36,14 @@ class LeaderboardAdapter : RecyclerView.Adapter<LeaderboardAdapter.LeaderboardVi
             1 -> R.drawable.avatar_female
             2 -> R.drawable.avatar_female2
             3 -> R.drawable.avatar_male2
+            4 -> R.drawable.avatar_male3
+            5 -> R.drawable.avatar_female3
+            6 -> R.drawable.avatar_female4
+            7 -> R.drawable.avatar_male4
+            8 -> R.drawable.fruit_icons2
+            9 -> R.drawable.fruit_icons3
+            10 -> R.drawable.fruit_icons4
+            11 -> R.drawable.fruit_icons
             else -> R.drawable.default_avatar
         }
         holder.binding.avatarImageView.setImageResource(avatarResId)

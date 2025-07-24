@@ -40,6 +40,14 @@ class EntryFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        // 🔁 Oturum açık mı kontrol et
+        val currentUser = FirebaseAuth.getInstance().currentUser
+        if (currentUser != null) {
+            // Oturum zaten açık → direkt ana sayfaya yönlendir
+            findNavController().navigate(R.id.action_entryFragment_to_listFragment)
+            return
+        }
+
         binding.layoutProfile.visibility = View.GONE
 
         binding.buttonRegister.setOnClickListener {
