@@ -1,10 +1,12 @@
 package com.quiz.myquizapp
 
+import android.app.AlertDialog
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
+import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
@@ -23,6 +25,8 @@ class ListFragment : Fragment() {
     private var _binding: FragmentListBinding? = null
     private val binding get() = _binding!!
 
+    private var selectedDifficulty: String = "easy" // Default seviye: kolay
+
     private lateinit var categoryAdapter: CategoryAdapter
     private val viewModel: ListViewModel by viewModels()
 
@@ -38,6 +42,29 @@ class ListFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
+        updateDifficultyUI()
+
+        // Zorluk seviyeleri butonları ve bilgilendirme dialogları
+        binding.easyButton.setOnClickListener {
+            selectedDifficulty = "easy"
+            updateDifficultyUI()
+            showDifficultyInfo("Kolay")
+        }
+
+        binding.mediumButton.setOnClickListener {
+            selectedDifficulty = "medium"
+            updateDifficultyUI()
+            showDifficultyInfo("Orta")
+        }
+
+        binding.hardButton.setOnClickListener {
+            selectedDifficulty = "hard"
+            updateDifficultyUI()
+            showDifficultyInfo("Zor")
+        }
+
+
 
         val userId = FirebaseAuth.getInstance().currentUser?.uid
         if (userId != null) {
@@ -89,7 +116,10 @@ class ListFragment : Fragment() {
         // Kategori listesi - Tek sütun
         binding.ListRecyclerView.layoutManager = LinearLayoutManager(requireContext())
         categoryAdapter = CategoryAdapter(listOf()) { selectedCategory ->
-            val action = ListFragmentDirections.actionListFragmentToQuestionsFragment(selectedCategory.name)
+            val action = ListFragmentDirections.actionListFragmentToQuestionsFragmentWithLevel(
+                selectedCategory = selectedCategory.name,
+                difficultyLevel = selectedDifficulty // seçilen zorluk seviyesi
+            )
             findNavController().navigate(action)
         }
         binding.ListRecyclerView.adapter = categoryAdapter
@@ -124,10 +154,45 @@ class ListFragment : Fragment() {
                     .build()
             )
         }
+
         binding.imageViewProfile.setOnClickListener {
             findNavController().navigate(R.id.action_listFragment_to_profileFragment)
         }
     }
+
+    // Seviye bilgisi gösteren AlertDialog fonksiyonu
+    private fun showDifficultyInfo(level: String) {
+        val message = when (level) {
+            "Kolay" -> "Kolay modda 10 dakika içerisinde 10 sorudan en az 6'sını doğru cevaplayarak 1 puan kazanabilirsin."
+            "Orta" -> "Orta modda 5 dakika içinde 10 sorudan en az 6'sını doğru yaparsan 2 puan kazanacaksın."
+            "Zor" -> "Zor modda 10 dakika içerisinde 20 sorudan en az 10 tanesini doğru cevaplayarak tam 3 puan kazanabilirsin!"
+            else -> ""
+        }
+
+        AlertDialog.Builder(requireContext())
+            .setTitle("$level Seviye Seçildi")
+            .setMessage(message)
+            .setPositiveButton("Hazırım") { dialog, _ ->
+                dialog.dismiss()
+            }
+            .show()
+    }
+
+    private fun updateDifficultyUI() {
+        // Tüm butonları gri yap
+        binding.easyButton.setBackgroundTintList(ContextCompat.getColorStateList(requireContext(), R.color.gray_unselected))
+        binding.mediumButton.setBackgroundTintList(ContextCompat.getColorStateList(requireContext(), R.color.gray_unselected))
+        binding.hardButton.setBackgroundTintList(ContextCompat.getColorStateList(requireContext(), R.color.gray_unselected))
+
+        // Seçilen butonu renklendir
+        when (selectedDifficulty) {
+            "easy" -> binding.easyButton.setBackgroundTintList(ContextCompat.getColorStateList(requireContext(), R.color.green_selected))
+            "medium" -> binding.mediumButton.setBackgroundTintList(ContextCompat.getColorStateList(requireContext(), R.color.orange_selected))
+            "hard" -> binding.hardButton.setBackgroundTintList(ContextCompat.getColorStateList(requireContext(), R.color.red_selected))
+        }
+    }
+
+
 
     override fun onDestroyView() {
         super.onDestroyView()

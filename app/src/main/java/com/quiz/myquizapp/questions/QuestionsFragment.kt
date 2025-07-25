@@ -15,6 +15,9 @@ import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import com.bumptech.glide.Glide
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.firestore.ktx.firestore
+import com.google.firebase.ktx.Firebase
 import com.quiz.myquizapp.R
 import com.quiz.myquizapp.databinding.FragmentQuestionsBinding
 import dagger.hilt.android.AndroidEntryPoint
@@ -46,11 +49,23 @@ class QuestionsFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
         val category = args.selectedCategory
+        val difficulty = args.difficultyLevel
+
+        when (difficulty) {
+            "easy" -> timeLeftInMillis = 10 * 60 * 1000 // 10 dakika
+            "medium" -> timeLeftInMillis = 5 * 60 * 1000 // 5 dakika
+            "hard" -> timeLeftInMillis = 10 * 60 * 1000
+        }
+
         viewModel.fetchQuestionsForCategory(getUrlForCategory(category))
 
         viewModel.questions.observe(viewLifecycleOwner) { list ->
             if (!list.isNullOrEmpty()) {
-                questionsList = list
+                questionsList = if (difficulty == "hard") {
+                    list.take(20) // zor modda 20 soru
+                } else {
+                    list.take(10) // kolay/orta modda 10 soru
+                }
                 currentQuestionIndex = 0
                 displayQuestion(currentQuestionIndex)
                 startTimer()
@@ -153,8 +168,22 @@ class QuestionsFragment : Fragment() {
         if (!isAdded) return
 
         val correctAnswers = calculateCorrectAnswers()
-        if (correctAnswers >= 6) {
-            updateUserScoreInFirestore {
+        val difficulty = args.difficultyLevel
+        val minCorrect = when (difficulty) {
+            "easy", "medium" -> 6
+            "hard" -> 10
+            else -> 6
+        }
+
+        val pointEarned = when (difficulty) {
+            "easy" -> 1
+            "medium" -> 2
+            "hard" -> 3
+            else -> 1
+        }
+
+        if (correctAnswers >= minCorrect) {
+            updateUserScoreInFirestore(pointEarned) {
                 if (isAdded) showResultDialog(correctAnswers)
             }
         } else {
@@ -162,17 +191,17 @@ class QuestionsFragment : Fragment() {
         }
     }
 
-    private fun updateUserScoreInFirestore(onComplete: () -> Unit) {
-        val user = com.google.firebase.auth.FirebaseAuth.getInstance().currentUser ?: return onComplete()
+    private fun updateUserScoreInFirestore(pointToAdd: Int, onComplete: () -> Unit) {
+        val user = FirebaseAuth.getInstance().currentUser ?: return onComplete()
 
-        val db = com.google.firebase.firestore.FirebaseFirestore.getInstance()
+        val db = Firebase.firestore
         val userRef = db.collection("users").document(user.uid)
 
         db.runTransaction { transaction ->
             val snapshot = transaction.get(userRef)
             val currentPoint = snapshot.getLong("point") ?: 0
             val currentLevel = snapshot.getLong("level") ?: 1
-            val newPoint = currentPoint + 1
+            val newPoint = currentPoint + pointToAdd
 
             if (newPoint >= 10) {
                 transaction.update(userRef, "level", currentLevel + 1)
@@ -182,12 +211,11 @@ class QuestionsFragment : Fragment() {
             }
         }.addOnSuccessListener { onComplete() }
             .addOnFailureListener {
-                if (isAdded) {
-                    Toast.makeText(requireContext(), "Puan güncellenemedi!", Toast.LENGTH_SHORT).show()
-                }
+                Toast.makeText(requireContext(), "Puan güncellenemedi!", Toast.LENGTH_SHORT).show()
                 onComplete()
             }
     }
+
 
     private fun showResultDialog(correctCount: Int) {
         if (!isAdded) return

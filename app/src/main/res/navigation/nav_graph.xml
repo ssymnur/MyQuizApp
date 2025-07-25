@@ -23,7 +23,7 @@
         android:label="fragment_list"
         tools:layout="@layout/fragment_list" >
         <action
-            android:id="@+id/action_listFragment_to_questionsFragment"
+            android:id="@+id/action_listFragment_to_questionsFragmentWithLevel"
             app:destination="@id/questionsFragment" />
         <action
             android:id="@+id/action_listFragment_to_entryFragment"
@@ -43,11 +43,18 @@
         android:label="QuestionsFragment"
         tools:layout="@layout/fragment_questions">
 
-        <!-- Argument ekledik -->
+        <!-- Tekil argument tanımlamaları -->
         <argument
             android:name="selectedCategory"
             app:argType="string" />
+
+        <argument
+            android:name="difficultyLevel"
+            app:argType="string"
+            android:defaultValue="easy" />
     </fragment>
+
+    <!-- Leaderboard Fragment -->
     <fragment
         android:id="@+id/leaderboardFragment"
         android:name="com.quiz.myquizapp.Leaderboard.LeaderboardFragment"
@@ -56,6 +63,8 @@
             android:id="@+id/action_leaderboardFragment_to_listFragment"
             app:destination="@id/listFragment" />
     </fragment>
+
+    <!-- Profile Fragment -->
     <fragment
         android:id="@+id/profileFragment"
         android:name="com.quiz.myquizapp.ProfileFragment"

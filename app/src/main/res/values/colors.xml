@@ -4,4 +4,10 @@
     <color name="white">#FFFFFFFF</color>
     <color name="lacivert">#0D47A1</color>
 
+    <color name="green_selected">#4CAF50</color>   <!-- kolay -->
+    <color name="orange_selected">#FF9800</color> <!-- orta -->
+    <color name="red_selected">#F44336</color>    <!-- zor -->
+    <color name="gray_unselected">#BDBDBD</color> <!-- diğerleri -->
+
+
 </resources>
