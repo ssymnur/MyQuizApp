@@ -98,6 +98,11 @@ dependencies {
     //timer
     implementation ("com.google.android.material:material:1.12.0")
 
+    //animasyon
+    implementation ("com.airbnb.android:lottie:6.1.0")
+
+
+
 }
 
 // Transitive dependency çözümü (gerekirse)

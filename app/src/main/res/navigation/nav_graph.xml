@@ -34,6 +34,11 @@
         <action
             android:id="@+id/action_listFragment_to_profileFragment"
             app:destination="@id/profileFragment" />
+        <argument
+            android:name="leveledUp"
+            app:argType="boolean"
+            android:defaultValue="false" />
+
     </fragment>
 
     <!-- Questions Fragment -->
@@ -43,7 +48,6 @@
         android:label="QuestionsFragment"
         tools:layout="@layout/fragment_questions">
 
-        <!-- Tekil argument tanımlamaları -->
         <argument
             android:name="selectedCategory"
             app:argType="string" />
@@ -52,6 +56,11 @@
             android:name="difficultyLevel"
             app:argType="string"
             android:defaultValue="easy" />
+
+        <!-- Bu action eklendi: -->
+        <action
+            android:id="@+id/action_questionsFragment_to_listFragment"
+            app:destination="@id/listFragment" />
     </fragment>
 
     <!-- Leaderboard Fragment -->

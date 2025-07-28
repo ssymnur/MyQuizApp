@@ -1,5 +1,6 @@
 package com.quiz.myquizapp
 
+import android.animation.Animator
 import android.app.AlertDialog
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -25,6 +26,9 @@ class ListFragment : Fragment() {
     private var _binding: FragmentListBinding? = null
     private val binding get() = _binding!!
 
+    private var previousLevel: Long = 1
+    private var isInitialLoad = true // 👈 Firestore başlangıç kontrolü
+
     private var selectedDifficulty: String = "easy" // Default seviye: kolay
 
     private lateinit var categoryAdapter: CategoryAdapter
@@ -43,9 +47,19 @@ class ListFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        val args = arguments?.let { ListFragmentArgs.fromBundle(it) }
+        if (args?.leveledUp == true) {
+            showConfettiDialog()
+
+            // leveledUp argümanını bir daha çalışmaması için sıfırla
+            parentFragmentManager.beginTransaction().run {
+                replace(id, this@ListFragment)
+                commit()
+            }
+        }
+
         updateDifficultyUI()
 
-        // Zorluk seviyeleri butonları ve bilgilendirme dialogları
         binding.easyButton.setOnClickListener {
             selectedDifficulty = "easy"
             updateDifficultyUI()
@@ -63,8 +77,6 @@ class ListFragment : Fragment() {
             updateDifficultyUI()
             showDifficultyInfo("Zor")
         }
-
-
 
         val userId = FirebaseAuth.getInstance().currentUser?.uid
         if (userId != null) {
@@ -107,18 +119,30 @@ class ListFragment : Fragment() {
                 if (e != null || snapshot == null || !snapshot.exists()) return@addSnapshotListener
                 val point = snapshot.getLong("point") ?: 0
                 val level = snapshot.getLong("level") ?: 1
+
+                // İlk yükleme ise previousLevel'i eşitle sadece
+                if (isInitialLoad) {
+                    previousLevel = level
+                    isInitialLoad = false
+                } else if (level > previousLevel) {
+                    showConfettiDialog()
+                    previousLevel = level
+                } else {
+                    previousLevel = level
+                }
+
                 if (isAdded && _binding != null) {
                     binding.textViewStats.text = "Puan: $point  |  Seviye: $level"
                 }
             }
         }
 
-        // Kategori listesi - Tek sütun
+        // Kategori listesi
         binding.ListRecyclerView.layoutManager = LinearLayoutManager(requireContext())
         categoryAdapter = CategoryAdapter(listOf()) { selectedCategory ->
             val action = ListFragmentDirections.actionListFragmentToQuestionsFragmentWithLevel(
                 selectedCategory = selectedCategory.name,
-                difficultyLevel = selectedDifficulty // seçilen zorluk seviyesi
+                difficultyLevel = selectedDifficulty
             )
             findNavController().navigate(action)
         }
@@ -133,7 +157,7 @@ class ListFragment : Fragment() {
             Toast.makeText(requireContext(), "Hata: $errorMsg", Toast.LENGTH_SHORT).show()
         }
 
-        // Footer ikonlarına tıklama
+        // Footer ikonları
         binding.imageViewLeaderboard.setOnClickListener {
             findNavController().navigate(
                 R.id.action_listFragment_to_leaderboardFragment,
@@ -158,9 +182,70 @@ class ListFragment : Fragment() {
         binding.imageViewProfile.setOnClickListener {
             findNavController().navigate(R.id.action_listFragment_to_profileFragment)
         }
+
+        //GÜNLÜK HEDİYE BUTONU
+        binding.dailyGiftButton.setOnClickListener {
+            val userId = FirebaseAuth.getInstance().currentUser?.uid ?: return@setOnClickListener
+            val userDocRef = Firebase.firestore.collection("users").document(userId)
+
+            userDocRef.get().addOnSuccessListener { document ->
+                val now = System.currentTimeMillis()
+                val lastGiftTime = document.getLong("lastGiftTimestamp") ?: 0
+                val twentyFourHoursMillis = 24 * 60 * 60 * 1000
+
+                if (now - lastGiftTime >= twentyFourHoursMillis) {
+                    val randomPoint = (1..2).random()
+                    val currentPoint = document.getLong("point") ?: 0
+                    val newPoint = currentPoint + randomPoint
+
+                    userDocRef.update(
+                        mapOf(
+                            "point" to newPoint,
+                            "lastGiftTimestamp" to now
+                        )
+                    ).addOnSuccessListener {
+                        showGiftAnimation(randomPoint)
+                    }
+                } else {
+                    val remainingMillis = twentyFourHoursMillis - (now - lastGiftTime)
+                    val hoursLeft = remainingMillis / (60 * 60 * 1000)
+                    val minutesLeft = (remainingMillis / (60 * 1000)) % 60
+                    Toast.makeText(
+                        requireContext(),
+                        "🎁 Tekrar açmak için: $hoursLeft saat $minutesLeft dakika kaldı",
+                        Toast.LENGTH_LONG
+                    ).show()
+                }
+            }
+        }
     }
 
-    // Seviye bilgisi gösteren AlertDialog fonksiyonu
+    private fun showGiftAnimation(points: Int) {
+        binding.giftOverlay.visibility = View.VISIBLE
+        binding.giftPointText.visibility = View.GONE
+        binding.giftAnimationView.setAnimation(R.raw.gift_box)
+        binding.giftAnimationView.playAnimation()
+
+        binding.giftAnimationView.addAnimatorListener(object : Animator.AnimatorListener {
+            override fun onAnimationStart(animation: Animator) {}
+            override fun onAnimationEnd(animation: Animator) {
+                binding.giftPointText.text = "🎉 $points Puan Kazandınız! 🎉"
+                binding.giftPointText.visibility = View.VISIBLE
+                binding.giftAnimationView.removeAllAnimatorListeners()
+            }
+
+            override fun onAnimationCancel(animation: Animator) {}
+            override fun onAnimationRepeat(animation: Animator) {}
+        })
+
+        // Overlay'e tıklanınca kapansın:
+        binding.giftOverlay.setOnClickListener {
+            binding.giftOverlay.visibility = View.GONE
+            binding.giftAnimationView.cancelAnimation()
+        }
+    }
+
+
     private fun showDifficultyInfo(level: String) {
         val message = when (level) {
             "Kolay" -> "Kolay modda 10 dakika içerisinde 10 sorudan en az 6'sını doğru cevaplayarak 1 puan kazanabilirsin."
@@ -172,24 +257,36 @@ class ListFragment : Fragment() {
         AlertDialog.Builder(requireContext())
             .setTitle("$level Seviye Seçildi")
             .setMessage(message)
-            .setPositiveButton("Hazırım") { dialog, _ ->
-                dialog.dismiss()
-            }
+            .setPositiveButton("Hazırım") { dialog, _ -> dialog.dismiss() }
             .show()
     }
 
     private fun updateDifficultyUI() {
-        // Tüm butonları gri yap
         binding.easyButton.setBackgroundTintList(ContextCompat.getColorStateList(requireContext(), R.color.gray_unselected))
         binding.mediumButton.setBackgroundTintList(ContextCompat.getColorStateList(requireContext(), R.color.gray_unselected))
         binding.hardButton.setBackgroundTintList(ContextCompat.getColorStateList(requireContext(), R.color.gray_unselected))
 
-        // Seçilen butonu renklendir
         when (selectedDifficulty) {
             "easy" -> binding.easyButton.setBackgroundTintList(ContextCompat.getColorStateList(requireContext(), R.color.green_selected))
             "medium" -> binding.mediumButton.setBackgroundTintList(ContextCompat.getColorStateList(requireContext(), R.color.orange_selected))
             "hard" -> binding.hardButton.setBackgroundTintList(ContextCompat.getColorStateList(requireContext(), R.color.red_selected))
         }
+    }
+
+    private fun showConfettiDialog() {
+        binding.confettiOverlay.visibility = View.VISIBLE
+        binding.confettiAnimationView.playAnimation()
+
+        binding.confettiAnimationView.addAnimatorListener(object : Animator.AnimatorListener {
+            override fun onAnimationStart(animation: Animator) {}
+            override fun onAnimationEnd(animation: Animator) {
+                binding.confettiOverlay.visibility = View.GONE
+            }
+            override fun onAnimationCancel(animation: Animator) {
+                binding.confettiOverlay.visibility = View.GONE
+            }
+            override fun onAnimationRepeat(animation: Animator) {}
+        })
     }
 
 

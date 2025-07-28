@@ -183,16 +183,20 @@ class QuestionsFragment : Fragment() {
         }
 
         if (correctAnswers >= minCorrect) {
-            updateUserScoreInFirestore(pointEarned) {
-                if (isAdded) showResultDialog(correctAnswers)
+            updateUserScoreInFirestore(pointEarned) { leveledUp ->
+                if (isAdded) {
+                    val action = QuestionsFragmentDirections.actionQuestionsFragmentToListFragment(leveledUp)
+                    findNavController().navigate(action)
+                }
             }
         } else {
             showResultDialog(correctAnswers)
         }
     }
 
-    private fun updateUserScoreInFirestore(pointToAdd: Int, onComplete: () -> Unit) {
-        val user = FirebaseAuth.getInstance().currentUser ?: return onComplete()
+
+    private fun updateUserScoreInFirestore(pointToAdd: Int, onComplete: (leveledUp: Boolean) -> Unit) {
+        val user = FirebaseAuth.getInstance().currentUser ?: return onComplete(false)
 
         val db = Firebase.firestore
         val userRef = db.collection("users").document(user.uid)
@@ -203,18 +207,21 @@ class QuestionsFragment : Fragment() {
             val currentLevel = snapshot.getLong("level") ?: 1
             val newPoint = currentPoint + pointToAdd
 
-            if (newPoint >= 10) {
+            val leveledUp = newPoint >= 10
+            if (leveledUp) {
                 transaction.update(userRef, "level", currentLevel + 1)
                 transaction.update(userRef, "point", 0)
             } else {
                 transaction.update(userRef, "point", newPoint)
             }
-        }.addOnSuccessListener { onComplete() }
+            leveledUp
+        }.addOnSuccessListener { leveledUp -> onComplete(leveledUp) }
             .addOnFailureListener {
                 Toast.makeText(requireContext(), "Puan güncellenemedi!", Toast.LENGTH_SHORT).show()
-                onComplete()
+                onComplete(false)
             }
     }
+
 
 
     private fun showResultDialog(correctCount: Int) {
