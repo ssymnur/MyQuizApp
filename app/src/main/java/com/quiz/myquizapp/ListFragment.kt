@@ -68,13 +68,11 @@ class ListFragment : Fragment() {
             }
         }
 
-
-
         binding.btnSelectCategory.setOnClickListener {
             selectedCategoryButton = R.id.btnSelectCategory
             isSecondGameMode = false
             setupCategoryAdapter()
-            toggleCategoryList()
+            showCategoryList()
             updateSelectedGameModeUI()
 
             // Arka planı setle ve tint'i temizle
@@ -89,7 +87,7 @@ class ListFragment : Fragment() {
             selectedCategoryButton = R.id.btnSelectCategory2
             isSecondGameMode = true
             setupCategoryAdapter()
-            toggleCategoryList()
+            showCategoryList()
             updateSelectedGameModeUI()
 
             binding.btnSelectCategory2.background = ContextCompat.getDrawable(requireContext(), R.drawable.gradient_blue)
@@ -252,10 +250,11 @@ class ListFragment : Fragment() {
         }
     }
 
-    private fun toggleCategoryList() {
-        isCategoryVisible = !isCategoryVisible
-        binding.ListRecyclerView.visibility = if (isCategoryVisible) View.VISIBLE else View.GONE
+    private fun showCategoryList() {
+        isCategoryVisible = true
+        binding.ListRecyclerView.visibility = View.VISIBLE
     }
+
 
     private fun setupCategoryAdapter() {
         categoryAdapter = CategoryAdapter(viewModel.categories.value ?: listOf()) { selectedCategory ->

@@ -244,14 +244,35 @@ class QuestionsFragment : Fragment() {
                     requireActivity().onBackPressedDispatcher.onBackPressed()
                 }
             }
+            .setNeutralButton("Cevapları Göster") { _, _ ->
+                showAnswersDialog()
+            }
             .setCancelable(false)
             .create()
             .show()
+
     }
 
+    private fun showAnswersDialog() {
+        val builder = AlertDialog.Builder(requireContext())
+        builder.setTitle("Sorular ve Doğru Cevaplar")
 
+        val message = StringBuilder()
 
+        for ((index, question) in questionsList.withIndex()) {
+            val userAnswer = userAnswers[index] ?: "Cevaplanmadı"
+            val correctAnswer = question.answer
+            val isCorrect = userAnswer == correctAnswer
 
+            message.append("🔹 Soru ${index + 1}:\n${question.question}\n")
+            message.append("✔️ Doğru Cevap: $correctAnswer\n")
+            message.append("🧍 Senin Cevabın: $userAnswer ${if (isCorrect) "✅" else "❌"}\n\n")
+        }
+
+        builder.setMessage(message.toString())
+        builder.setPositiveButton("Kapat") { dialog, _ -> dialog.dismiss() }
+        builder.show()
+    }
 
 
     private fun startWarningAnimation() {
