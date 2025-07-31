@@ -6,12 +6,15 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.animation.AnimationUtils
 import android.widget.Toast
+import androidx.cardview.widget.CardView
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.airbnb.lottie.LottieAnimationView
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.ListenerRegistration
 import com.google.firebase.firestore.ktx.firestore
@@ -26,20 +29,20 @@ class ListFragment : Fragment() {
     private var _binding: FragmentListBinding? = null
     private val binding get() = _binding!!
 
-    private var previousLevel: Long = 1
-    private var isInitialLoad = true // 👈 Firestore başlangıç kontrolü
+    private var selectedCategoryButton: Int = R.id.btnSelectCategory
 
-    private var selectedDifficulty: String = "easy" // Default seviye: kolay
+    private var isSecondGameMode = false
+    private var isCategoryVisible = true
+    private var previousLevel: Long = 1
+    private var isInitialLoad = true
+    private var selectedDifficulty: String = "easy"
 
     private lateinit var categoryAdapter: CategoryAdapter
     private val viewModel: ListViewModel by viewModels()
 
     private var userDocListener: ListenerRegistration? = null
 
-    override fun onCreateView(
-        inflater: LayoutInflater, container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View {
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         _binding = FragmentListBinding.inflate(inflater, container, false)
         return binding.root
     }
@@ -47,16 +50,56 @@ class ListFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        // --- Butonlar ilk durumda ayarlansın ---
+        selectedCategoryButton = R.id.btnSelectCategory
+        isSecondGameMode = false
+        updateSelectedGameModeUI()
+        binding.btnSelectCategory.background = ContextCompat.getDrawable(requireContext(), R.drawable.gradient_blue)
+        binding.btnSelectCategory.backgroundTintList = null
+        binding.btnSelectCategory2.background = ContextCompat.getDrawable(requireContext(), R.drawable.solid_lacivert)
+        binding.btnSelectCategory2.backgroundTintList = null
+
         val args = arguments?.let { ListFragmentArgs.fromBundle(it) }
         if (args?.leveledUp == true) {
             showConfettiDialog()
-
-            // leveledUp argümanını bir daha çalışmaması için sıfırla
             parentFragmentManager.beginTransaction().run {
                 replace(id, this@ListFragment)
                 commit()
             }
         }
+
+
+
+        binding.btnSelectCategory.setOnClickListener {
+            selectedCategoryButton = R.id.btnSelectCategory
+            isSecondGameMode = false
+            setupCategoryAdapter()
+            toggleCategoryList()
+            updateSelectedGameModeUI()
+
+            // Arka planı setle ve tint'i temizle
+            binding.btnSelectCategory.background = ContextCompat.getDrawable(requireContext(), R.drawable.gradient_blue)
+            binding.btnSelectCategory.backgroundTintList = null
+
+            binding.btnSelectCategory2.background = ContextCompat.getDrawable(requireContext(), R.drawable.solid_lacivert)
+            binding.btnSelectCategory2.backgroundTintList = null
+        }
+
+        binding.btnSelectCategory2.setOnClickListener {
+            selectedCategoryButton = R.id.btnSelectCategory2
+            isSecondGameMode = true
+            setupCategoryAdapter()
+            toggleCategoryList()
+            updateSelectedGameModeUI()
+
+            binding.btnSelectCategory2.background = ContextCompat.getDrawable(requireContext(), R.drawable.gradient_blue)
+            binding.btnSelectCategory2.backgroundTintList = null
+
+            binding.btnSelectCategory.background = ContextCompat.getDrawable(requireContext(), R.drawable.solid_lacivert)
+            binding.btnSelectCategory.backgroundTintList = null
+        }
+
+
 
         updateDifficultyUI()
 
@@ -102,8 +145,7 @@ class ListFragment : Fragment() {
                         else -> R.drawable.default_avatar
                     }
 
-                    binding.textViewWelcome.text =
-                        "Hoş geldin $nickname!\nHaydi şimdi soruları çözmeye başlayalım!"
+                    binding.textViewWelcome.text = "Hoş geldin $nickname!\nHaydi şimdi soruları çözmeye başlayalım!"
                     binding.imageViewAvatar.setImageResource(avatarResId)
                 }
             }
@@ -120,7 +162,6 @@ class ListFragment : Fragment() {
                 val point = snapshot.getLong("point") ?: 0
                 val level = snapshot.getLong("level") ?: 1
 
-                // İlk yükleme ise previousLevel'i eşitle sadece
                 if (isInitialLoad) {
                     previousLevel = level
                     isInitialLoad = false
@@ -137,16 +178,8 @@ class ListFragment : Fragment() {
             }
         }
 
-        // Kategori listesi
         binding.ListRecyclerView.layoutManager = LinearLayoutManager(requireContext())
-        categoryAdapter = CategoryAdapter(listOf()) { selectedCategory ->
-            val action = ListFragmentDirections.actionListFragmentToQuestionsFragmentWithLevel(
-                selectedCategory = selectedCategory.name,
-                difficultyLevel = selectedDifficulty
-            )
-            findNavController().navigate(action)
-        }
-        binding.ListRecyclerView.adapter = categoryAdapter
+        setupCategoryAdapter()
 
         viewModel.getCategories()
         viewModel.categories.observe(viewLifecycleOwner) { list ->
@@ -157,7 +190,6 @@ class ListFragment : Fragment() {
             Toast.makeText(requireContext(), "Hata: $errorMsg", Toast.LENGTH_SHORT).show()
         }
 
-        // Footer ikonları
         binding.imageViewLeaderboard.setOnClickListener {
             findNavController().navigate(
                 R.id.action_listFragment_to_leaderboardFragment,
@@ -167,6 +199,7 @@ class ListFragment : Fragment() {
                     .build()
             )
         }
+
 
         binding.imageViewLogout.setOnClickListener {
             FirebaseAuth.getInstance().signOut()
@@ -183,7 +216,6 @@ class ListFragment : Fragment() {
             findNavController().navigate(R.id.action_listFragment_to_profileFragment)
         }
 
-        //GÜNLÜK HEDİYE BUTONU
         binding.dailyGiftButton.setOnClickListener {
             val userId = FirebaseAuth.getInstance().currentUser?.uid ?: return@setOnClickListener
             val userDocRef = Firebase.firestore.collection("users").document(userId)
@@ -220,6 +252,28 @@ class ListFragment : Fragment() {
         }
     }
 
+    private fun toggleCategoryList() {
+        isCategoryVisible = !isCategoryVisible
+        binding.ListRecyclerView.visibility = if (isCategoryVisible) View.VISIBLE else View.GONE
+    }
+
+    private fun setupCategoryAdapter() {
+        categoryAdapter = CategoryAdapter(viewModel.categories.value ?: listOf()) { selectedCategory ->
+            if (isSecondGameMode) {
+                val action = ListFragmentDirections.actionListFragmentToWordGameFragment(selectedCategory.name)
+                findNavController().navigate(action)
+            } else {
+                val action = ListFragmentDirections.actionListFragmentToQuestionsFragmentWithLevel(
+                    selectedCategory = selectedCategory.name,
+                    difficultyLevel = selectedDifficulty
+                )
+                findNavController().navigate(action)
+            }
+        }
+        binding.ListRecyclerView.adapter = categoryAdapter
+        binding.ListRecyclerView.visibility = View.VISIBLE
+    }
+
     private fun showGiftAnimation(points: Int) {
         binding.giftOverlay.visibility = View.VISIBLE
         binding.giftPointText.visibility = View.GONE
@@ -238,12 +292,28 @@ class ListFragment : Fragment() {
             override fun onAnimationRepeat(animation: Animator) {}
         })
 
-        // Overlay'e tıklanınca kapansın:
         binding.giftOverlay.setOnClickListener {
             binding.giftOverlay.visibility = View.GONE
             binding.giftAnimationView.cancelAnimation()
         }
     }
+
+    private fun updateSelectedGameModeUI() {
+        if (selectedCategoryButton == R.id.btnSelectCategory) {
+            // Birinci buton gradient olsun
+            binding.btnSelectCategory.setBackgroundResource(R.drawable.gradient_blue)
+
+            // İkinci buton düz lacivert
+            binding.btnSelectCategory2.background = ContextCompat.getDrawable(requireContext(), R.drawable.solid_lacivert)
+        } else {
+            binding.btnSelectCategory2.setBackgroundResource(R.drawable.gradient_blue)
+            binding.btnSelectCategory.background = ContextCompat.getDrawable(requireContext(), R.drawable.solid_lacivert)
+        }
+    }
+
+
+
+
 
 
     private fun showDifficultyInfo(level: String) {
@@ -273,6 +343,8 @@ class ListFragment : Fragment() {
         }
     }
 
+
+
     private fun showConfettiDialog() {
         binding.confettiOverlay.visibility = View.VISIBLE
         binding.confettiAnimationView.playAnimation()
@@ -282,14 +354,14 @@ class ListFragment : Fragment() {
             override fun onAnimationEnd(animation: Animator) {
                 binding.confettiOverlay.visibility = View.GONE
             }
+
             override fun onAnimationCancel(animation: Animator) {
                 binding.confettiOverlay.visibility = View.GONE
             }
+
             override fun onAnimationRepeat(animation: Animator) {}
         })
     }
-
-
 
     override fun onDestroyView() {
         super.onDestroyView()

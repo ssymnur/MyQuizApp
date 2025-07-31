@@ -9,5 +9,8 @@
     <color name="red_selected">#F44336</color>    <!-- zor -->
     <color name="gray_unselected">#BDBDBD</color> <!-- diğerleri -->
 
+    <color name="blue_dark">#0D47A1</color>
+
+
 
 </resources>

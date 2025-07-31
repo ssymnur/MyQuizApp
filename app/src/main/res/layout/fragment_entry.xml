@@ -17,10 +17,21 @@
             android:layout_width="250dp"
             android:layout_height="250dp"
             android:src="@drawable/welcome"
-            android:layout_marginBottom="32dp"
+            android:layout_marginBottom="12dp"
             android:contentDescription="App Logo" />
 
+
         <!-- Login layout -->
+
+        <ImageView
+            android:id="@+id/imageViewEye"
+            android:layout_width="80dp"
+            android:layout_height="77dp"
+            android:layout_gravity="center"
+            android:layout_marginBottom="12dp"
+            android:contentDescription="Eye Icon"
+            android:src="@drawable/eye_open" />
+
         <LinearLayout
             android:id="@+id/layoutLogin"
             android:layout_width="match_parent"

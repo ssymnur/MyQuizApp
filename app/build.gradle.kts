@@ -101,6 +101,9 @@ dependencies {
     //animasyon
     implementation ("com.airbnb.android:lottie:6.1.0")
 
+    implementation ("com.google.android.material:material:1.9.0")
+
+
 
 
 }

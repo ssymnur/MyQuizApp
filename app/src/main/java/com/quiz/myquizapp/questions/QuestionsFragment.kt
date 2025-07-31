@@ -175,23 +175,14 @@ class QuestionsFragment : Fragment() {
             else -> 6
         }
 
-        val pointEarned = when (difficulty) {
-            "easy" -> 1
-            "medium" -> 2
-            "hard" -> 3
-            else -> 1
-        }
+        difficulty
 
         if (correctAnswers >= minCorrect) {
-            updateUserScoreInFirestore(pointEarned) { leveledUp ->
-                if (isAdded) {
-                    val action = QuestionsFragmentDirections.actionQuestionsFragmentToListFragment(leveledUp)
-                    findNavController().navigate(action)
-                }
-            }
+            showResultDialog(correctAnswers, isSuccess = true) // 🎈 Balloon dialog göster
         } else {
-            showResultDialog(correctAnswers)
+            showResultDialog(correctAnswers, isSuccess = false) // 🙁 Sad dialog
         }
+
     }
 
 
@@ -222,9 +213,7 @@ class QuestionsFragment : Fragment() {
             }
     }
 
-
-
-    private fun showResultDialog(correctCount: Int) {
+    private fun showResultDialog(correctCount: Int, isSuccess: Boolean) {
         if (!isAdded) return
 
         val total = questionsList.size
@@ -233,7 +222,7 @@ class QuestionsFragment : Fragment() {
         val imageResult = view.findViewById<ImageView>(R.id.imageResult)
         val textResultMessage = view.findViewById<TextView>(R.id.textResultMessage)
 
-        if (correctCount >= 6) {
+        if (isSuccess) {
             imageResult.setImageResource(R.drawable.balloon)
             textResultMessage.text = "Tebrikler! $total sorudan $correctCount tanesini doğru cevapladınız 🎉"
         } else {
@@ -244,12 +233,26 @@ class QuestionsFragment : Fragment() {
         AlertDialog.Builder(requireContext())
             .setView(view)
             .setPositiveButton("Kategoriye Dön") { _, _ ->
-                requireActivity().onBackPressedDispatcher.onBackPressed()
+                if (isSuccess) {
+                    updateUserScoreInFirestore(/* puan eklenecek */1) { leveledUp ->
+                        if (isAdded) {
+                            val action = QuestionsFragmentDirections.actionQuestionsFragmentToListFragment(leveledUp)
+                            findNavController().navigate(action)
+                        }
+                    }
+                } else {
+                    requireActivity().onBackPressedDispatcher.onBackPressed()
+                }
             }
             .setCancelable(false)
             .create()
             .show()
     }
+
+
+
+
+
 
     private fun startWarningAnimation() {
         val blinkAnim = AnimationUtils.loadAnimation(requireContext(), R.anim.blink)
@@ -269,8 +272,19 @@ class QuestionsFragment : Fragment() {
             }
 
             override fun onFinish() {
-                showResultDialog(calculateCorrectAnswers())
+                val correct = calculateCorrectAnswers()
+
+                val minCorrect = when (args.difficultyLevel) {
+                    "easy", "medium" -> 6
+                    "hard" -> 10
+                    else -> 6
+                }
+
+                val isSuccess = correct >= minCorrect
+
+                showResultDialog(correct, isSuccess)
             }
+
         }.start()
     }
 

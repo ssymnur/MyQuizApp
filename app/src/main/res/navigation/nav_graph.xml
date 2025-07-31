@@ -38,6 +38,9 @@
             android:name="leveledUp"
             app:argType="boolean"
             android:defaultValue="false" />
+        <action
+            android:id="@+id/action_listFragment_to_wordGameFragment"
+            app:destination="@id/wordGameFragment" />
 
     </fragment>
 
@@ -81,6 +84,27 @@
         <action
             android:id="@+id/action_profileFragment_to_listFragment"
             app:destination="@id/listFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/wordGameFragment"
+        android:name="com.quiz.myquizapp.wordGame.WordGameFragment"
+        android:label="fragment_word_game"
+        tools:layout="@layout/fragment_word_game" >
+        <action
+            android:id="@+id/action_wordGameFragment_to_listFragment"
+            app:destination="@id/listFragment" />
+        <argument
+            android:name="category"
+            app:argType="string" />
+        <argument
+            android:name="difficultyLevel"
+            app:argType="string"
+            android:defaultValue="easy"/>
+        <argument
+            android:name="leveledUp"
+            app:argType="boolean"
+            android:defaultValue="false" />
+
     </fragment>
 
 </navigation>

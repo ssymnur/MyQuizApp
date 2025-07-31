@@ -2,6 +2,8 @@ package com.quiz.myquizapp.fragment.entry
 
 import android.content.Context
 import android.os.Bundle
+import android.text.Editable
+import android.text.TextWatcher
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -40,6 +42,8 @@ class EntryFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+
+
         // 🔁 Oturum açık mı kontrol et
         val currentUser = FirebaseAuth.getInstance().currentUser
         if (currentUser != null) {
@@ -47,6 +51,33 @@ class EntryFragment : Fragment() {
             findNavController().navigate(R.id.action_entryFragment_to_listFragment)
             return
         }
+
+        // Göz resmi başlangıçta açık
+        binding.imageViewEye.setImageResource(R.drawable.eye_open)
+
+        // Şifre kutusu odaklanınca veya yazı yazılınca göz kapanacak
+        binding.editTextPassword.setOnFocusChangeListener { _, hasFocus ->
+            if (hasFocus) {
+                binding.imageViewEye.setImageResource(R.drawable.eye_closed)
+            } else {
+                binding.imageViewEye.setImageResource(R.drawable.eye_open)
+            }
+        }
+
+        binding.editTextPassword.addTextChangedListener(object : TextWatcher {
+            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
+
+            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
+                if (!s.isNullOrEmpty()) {
+                    binding.imageViewEye.setImageResource(R.drawable.eye_closed)
+                } else {
+                    binding.imageViewEye.setImageResource(R.drawable.eye_open)
+                }
+            }
+
+            override fun afterTextChanged(s: Editable?) {}
+        })
+
 
         binding.layoutProfile.visibility = View.GONE
 

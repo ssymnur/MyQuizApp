@@ -12,32 +12,37 @@ class CategoryAdapter(
     private val onItemClick: (Category) -> Unit
 ) : RecyclerView.Adapter<CategoryAdapter.CategoryViewHolder>() {
 
-    inner class CategoryViewHolder(val binding: RecyclerRowBinding) : RecyclerView.ViewHolder(binding.root)
+    inner class CategoryViewHolder(val binding: RecyclerRowBinding) :
+        RecyclerView.ViewHolder(binding.root)
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): CategoryViewHolder {
-        val binding = RecyclerRowBinding.inflate(LayoutInflater.from(parent.context), parent, false)
+        val inflater = LayoutInflater.from(parent.context)
+        val binding = RecyclerRowBinding.inflate(inflater, parent, false)
         return CategoryViewHolder(binding)
     }
 
     override fun onBindViewHolder(holder: CategoryViewHolder, position: Int) {
         val category = categoryList[position]
+        val context = holder.itemView.context
+
+        // Kategori adını ata
         holder.binding.textViewCategoryName.text = category.name
 
-        // Arka plana Glide ile görsel yükle
-        Glide.with(holder.itemView.context)
+        // Görseli Glide ile arka plana yükle
+        Glide.with(context)
             .load(category.imageUrl)
             .centerCrop()
             .into(holder.binding.imageViewBackground)
 
-        // Animasyonlu tıklama
+        // Tıklanabilirlik ve animasyon
         holder.itemView.setOnClickListener {
-            val scaleAnim = AnimationUtils.loadAnimation(holder.itemView.context, R.anim.click_scale)
+            val scaleAnim = AnimationUtils.loadAnimation(context, R.anim.click_scale)
             holder.itemView.startAnimation(scaleAnim)
 
-            // Animasyon sonrası yönlendirme
+            // Animasyon bittikten sonra callback çağır
             holder.itemView.postDelayed({
                 onItemClick(category)
-            }, 100) // Animasyon süresi kadar beklet
+            }, 100)
         }
     }
 

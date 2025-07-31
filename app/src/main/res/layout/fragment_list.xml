@@ -1,24 +1,26 @@
 <?xml version="1.0" encoding="utf-8"?>
-    <!-- Root FrameLayout ile başlıyoruz ki overlay’i ekran üstüne tam koyabilelim -->
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <!-- Ana içerik LinearLayout -->
-    <LinearLayout
-        android:orientation="vertical"
-        android:padding="16dp"
+    <!-- Ana icerik -->
+    <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="match_parent"
+        android:padding="16dp">
 
-        <!-- Üst kısım: Avatar ve karşılama metni -->
+        <!-- Header -->
         <LinearLayout
-            android:layout_width="match_parent"
+            android:id="@+id/headerLayout"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
             android:gravity="center_vertical"
-            android:paddingBottom="16dp">
+            android:paddingBottom="16dp"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent">
 
             <ImageView
                 android:id="@+id/imageViewAvatar"
@@ -29,29 +31,31 @@
 
             <TextView
                 android:id="@+id/textViewWelcome"
-                android:layout_width="0dp"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_weight="1"
+                android:layout_marginStart="12dp"
                 android:text="Hoş geldin!"
                 android:textSize="16sp"
-                android:paddingStart="12dp"
                 android:textColor="#333333" />
         </LinearLayout>
 
-        <!-- Kullanıcı puan ve seviye bilgisi ve günlük hediye butonu yan yana -->
+        <!-- Stats -->
         <LinearLayout
-            android:layout_width="wrap_content"
+            android:id="@+id/statsLayout"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_gravity="center_horizontal"
             android:orientation="horizontal"
-            android:gravity="center_vertical"
-            android:layout_marginBottom="16dp">
+            android:gravity="center"
+            android:layout_marginBottom="16dp"
+            app:layout_constraintTop_toBottomOf="@id/headerLayout"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent">
 
             <TextView
                 android:id="@+id/textViewStats"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="🏆 Puan: 0   🎖️ Seviye: 1 "
+                android:text="🏆 Puan: 0   🎖️ Seviye: 1"
                 android:textSize="16sp"
                 android:textStyle="bold"
                 android:textColor="#444444" />
@@ -61,27 +65,29 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="🎁"
+                android:textColor="#444444"
                 android:textSize="24sp"
                 android:layout_marginStart="16dp"
                 android:background="@android:color/transparent"
-                android:textColor="#FFFFFF"
                 android:minWidth="0dp"
                 android:minHeight="0dp"
                 android:paddingStart="12dp"
                 android:paddingEnd="12dp"
                 android:paddingTop="6dp"
-                android:paddingBottom="6dp"
-                android:layout_gravity="center_vertical" />
+                android:paddingBottom="6dp" />
         </LinearLayout>
 
-        <!-- Zorluk seçimi butonları (widget gibi) -->
+        <!-- Zorluk secimi -->
         <LinearLayout
             android:id="@+id/difficultyWidget"
-            android:layout_width="match_parent"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
             android:gravity="center"
-            android:layout_marginBottom="16dp">
+            android:layout_marginBottom="16dp"
+            app:layout_constraintTop_toBottomOf="@id/statsLayout"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent">
 
             <Button
                 android:id="@+id/easyButton"
@@ -113,25 +119,72 @@
                 android:textColor="#FFFFFF" />
         </LinearLayout>
 
-        <!-- Kategoriler listesi -->
+        <!-- Kategori Sec 1 -->
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnSelectCategory"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:layout_marginHorizontal="32dp"
+            android:paddingVertical="20dp"
+            android:text="🧠 Çoktan Seçmeli Sorular"
+            android:textAllCaps="false"
+            android:textSize="18sp"
+            android:textColor="@android:color/white"
+            app:cornerRadius="24dp"
+            app:background="@drawable/gradient_blue"
+            app:elevation="6dp"
+            app:iconGravity="textStart"
+            app:layout_constraintTop_toBottomOf="@id/difficultyWidget"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnSelectCategory2"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:layout_marginHorizontal="32dp"
+            android:paddingVertical="20dp"
+            android:text="🔤 Harfleri Birleştir"
+            android:textAllCaps="false"
+            android:textSize="18sp"
+            android:textColor="@android:color/white"
+            app:background="@drawable/gradient_blue"
+            app:cornerRadius="24dp"
+            app:elevation="6dp"
+            app:iconGravity="textStart"
+            app:layout_constraintTop_toBottomOf="@id/btnSelectCategory"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent" />
+
+        <!-- RecyclerView -->
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/ListRecyclerView"
-            android:layout_width="match_parent"
+            android:layout_width="0dp"
             android:layout_height="0dp"
-            android:layout_weight="1"
-            android:clipToPadding="false"
-            android:scrollbars="vertical" />
+            android:visibility="gone"
+            android:paddingTop="8dp"
+            app:layout_constraintTop_toBottomOf="@id/btnSelectCategory2"
+            app:layout_constraintBottom_toTopOf="@id/footerLayout"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent" />
 
-        <!-- Alt menü -->
+
+
+        <!-- Footer -->
         <LinearLayout
             android:id="@+id/footerLayout"
-            android:layout_width="match_parent"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:gravity="center"
+            android:background="#0D47A1"
             android:orientation="horizontal"
+            android:gravity="center"
             android:paddingTop="12dp"
             android:paddingBottom="12dp"
-            android:background="#0D47A1">
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent">
 
             <ImageView
                 android:id="@+id/imageViewLeaderboard"
@@ -142,10 +195,7 @@
                 android:padding="8dp"
                 android:tint="#FFFFFF" />
 
-            <View
-                android:layout_width="32dp"
-                android:layout_height="1dp"
-                android:background="@android:color/transparent" />
+            <View android:layout_width="32dp" android:layout_height="1dp" android:background="@android:color/transparent" />
 
             <ImageView
                 android:id="@+id/imageViewLogout"
@@ -156,10 +206,7 @@
                 android:padding="8dp"
                 android:tint="#FFFFFF" />
 
-            <View
-                android:layout_width="32dp"
-                android:layout_height="1dp"
-                android:background="@android:color/transparent" />
+            <View android:layout_width="32dp" android:layout_height="1dp" android:background="@android:color/transparent" />
 
             <ImageView
                 android:id="@+id/imageViewProfile"
@@ -171,9 +218,9 @@
                 android:tint="#FFFFFF" />
         </LinearLayout>
 
-    </LinearLayout>
+    </androidx.constraintlayout.widget.ConstraintLayout>
 
-    <!-- Konfeti overlay - ROOT içinde, diğer layoutların üstünde, tam ekran -->
+    <!-- Konfeti overlay -->
     <FrameLayout
         android:id="@+id/confettiOverlay"
         android:layout_width="match_parent"
@@ -214,6 +261,8 @@
                 android:layout_marginTop="8dp" />
         </LinearLayout>
     </FrameLayout>
+
+    <!-- Hediye overlay -->
     <FrameLayout
         android:id="@+id/giftOverlay"
         android:layout_width="match_parent"
@@ -255,6 +304,5 @@
                 android:layout_marginTop="12dp" />
         </LinearLayout>
     </FrameLayout>
-
 
 </FrameLayout>
