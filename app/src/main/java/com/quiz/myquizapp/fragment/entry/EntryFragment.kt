@@ -152,6 +152,10 @@ class EntryFragment : Fragment() {
                         .document(userId)
                         .set(userMap)
                         .addOnSuccessListener {
+                            // ✅ Burada SharedPreferences'a kaydediyoruz
+                            val prefs = requireActivity().getSharedPreferences("MyPrefs", Context.MODE_PRIVATE)
+                            prefs.edit().putBoolean("firstLogin", true).apply()
+
                             findNavController().navigate(R.id.action_entryFragment_to_listFragment)
                         }
                         .addOnFailureListener {

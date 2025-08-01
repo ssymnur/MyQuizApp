@@ -2,11 +2,13 @@ package com.quiz.myquizapp
 
 import android.animation.Animator
 import android.app.AlertDialog
+import android.content.Context
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.view.animation.AnimationUtils
+import android.widget.TextView
 import android.widget.Toast
 import androidx.cardview.widget.CardView
 import androidx.core.content.ContextCompat
@@ -49,6 +51,15 @@ class ListFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
+        val prefs = requireActivity().getSharedPreferences("MyPrefs", Context.MODE_PRIVATE)
+        val isFirstLogin = prefs.getBoolean("firstLogin", false)
+
+        if (isFirstLogin) {
+            showWelcomeDialog() // 👈 hoş geldin AlertDialog'u göster
+            prefs.edit().putBoolean("firstLogin", false).apply() // bir daha gösterme
+        }
+
 
         // --- Butonlar ilk durumda ayarlansın ---
         selectedCategoryButton = R.id.btnSelectCategory
@@ -352,8 +363,6 @@ class ListFragment : Fragment() {
         }
     }
 
-
-
     private fun showConfettiDialog() {
         binding.confettiOverlay.visibility = View.VISIBLE
         binding.confettiAnimationView.playAnimation()
@@ -371,6 +380,31 @@ class ListFragment : Fragment() {
             override fun onAnimationRepeat(animation: Animator) {}
         })
     }
+
+    private fun showWelcomeDialog() {
+        val userId = FirebaseAuth.getInstance().currentUser?.uid ?: return
+        val userRef = Firebase.firestore.collection("users").document(userId)
+
+        userRef.get().addOnSuccessListener { doc ->
+            val nickname = doc.getString("nickname") ?: "kullanıcı"
+
+            val dialogView = LayoutInflater.from(requireContext()).inflate(R.layout.dialog_welcome, null)
+            val lottieView = dialogView.findViewById<LottieAnimationView>(R.id.lottieView)
+            lottieView.setAnimation("welcome.json")
+            lottieView.playAnimation()
+
+
+            val textView = dialogView.findViewById<TextView>(R.id.textWelcome)
+            textView.text = "🎉 Aramıza hoş geldin $nickname!\nHaydi, bilgini konuştur ve harika puanlar topla!"
+
+            AlertDialog.Builder(requireContext())
+                .setView(dialogView)
+                .setPositiveButton("Devam") { dialog, _ -> dialog.dismiss() }
+                .setCancelable(false)
+                .show()
+        }
+    }
+
 
     override fun onDestroyView() {
         super.onDestroyView()
