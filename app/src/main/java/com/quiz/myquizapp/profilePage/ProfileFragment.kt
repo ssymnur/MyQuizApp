@@ -7,6 +7,7 @@ import android.view.ViewGroup
 import android.widget.Toast
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
+import androidx.navigation.fragment.findNavController
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.quiz.myquizapp.databinding.FragmentProfileBinding
@@ -47,6 +48,13 @@ class ProfileFragment : Fragment() {
                     setupAvatarClicks(level)
                 }
             }
+
+
+        binding.buttonExit.setOnClickListener {
+            val action = ProfileFragmentDirections.actionProfileFragmentToListFragment()
+            findNavController().navigate(action)
+        }
+
 
         binding.buttonSave.setOnClickListener {
             val newNickname = binding.editTextNickname.text.toString().trim()

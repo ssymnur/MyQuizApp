@@ -200,15 +200,25 @@ class ListFragment : Fragment() {
 
 
         binding.imageViewLogout.setOnClickListener {
-            FirebaseAuth.getInstance().signOut()
-            findNavController().navigate(
-                R.id.action_listFragment_to_entryFragment,
-                null,
-                androidx.navigation.NavOptions.Builder()
-                    .setPopUpTo(R.id.entryFragment, inclusive = true)
-                    .build()
-            )
+            AlertDialog.Builder(requireContext())
+                .setTitle("Çıkış Yap")
+                .setMessage("Çıkış yapmak istediğinize emin misiniz?")
+                .setPositiveButton("Evet") { _, _ ->
+                    FirebaseAuth.getInstance().signOut()
+                    findNavController().navigate(
+                        R.id.action_listFragment_to_entryFragment,
+                        null,
+                        androidx.navigation.NavOptions.Builder()
+                            .setPopUpTo(R.id.entryFragment, inclusive = true)
+                            .build()
+                    )
+                }
+                .setNegativeButton("Hayır") { dialog, _ ->
+                    dialog.dismiss()
+                }
+                .show()
         }
+
 
         binding.imageViewProfile.setOnClickListener {
             findNavController().navigate(R.id.action_listFragment_to_profileFragment)

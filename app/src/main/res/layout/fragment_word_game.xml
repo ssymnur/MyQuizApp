@@ -1,104 +1,126 @@
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/wordGameLayout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:padding="24dp"
+    android:orientation="vertical"
+    android:gravity="center_horizontal"
     tools:context=".wordGame.WordGameFragment">
 
-    <LinearLayout
-        xmlns:android="http://schemas.android.com/apk/res/android"
-        android:id="@+id/wordGameLayout"
+
+    <!-- Geri Sayım -->
+    <TextView
+        android:id="@+id/textViewTimer"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="10:00"
+        android:textSize="30sp"
+        android:textColor="#0D47A1"
+        android:layout_marginBottom="8dp" />
+
+    <!-- Soru Numarası -->
+    <TextView
+        android:id="@+id/textViewQuestionProgress"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Soru 1 / 10"
+        android:textSize="16sp"
+        android:textColor="#0D47A1"
+        android:layout_marginBottom="4dp" />
+
+    <!-- ProgressBar -->
+    <ProgressBar
+        android:id="@+id/progressBar"
+        style="?android:attr/progressBarStyleHorizontal"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:padding="24dp"
-        android:orientation="vertical"
-        android:gravity="center_horizontal">
+        android:layout_height="20dp"
+        android:max="100"
+        android:progress="30"
+        android:scaleY="3"
+        android:progressTint="#0D47A1"
+        android:backgroundTint="#E1BEE7"
+        android:layout_marginBottom="16dp"
+        android:clipToOutline="true" />
 
-        <TextView
-            android:id="@+id/textViewTimer"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="10:00"
-            android:textSize="30sp"
-            android:textColor="#0D47A1"
-            android:layout_gravity="center_horizontal"
-            android:layout_marginTop="16dp"
-            android:layout_marginBottom="8dp"/>
+    <!-- Karışık Kelime -->
+    <TextView
+        android:id="@+id/textViewScrambledWord"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Karışık Harf: artna"
+        android:textSize="20sp"
+        android:textStyle="bold"
+        android:padding="16dp"
+        android:layout_marginTop="8dp"
+        android:layout_marginBottom="8dp" />
+
+    <!-- Görsel -->
+    <ImageView
+        android:id="@+id/imageViewWord"
+        android:layout_width="match_parent"
+        android:layout_height="200dp"
+        android:layout_marginBottom="24dp"
+        android:layout_marginTop="16dp"
+        android:scaleType="fitCenter"
+        android:visibility="invisible" />
+
+    <!-- Cevap Girişi -->
+    <EditText
+        android:id="@+id/editTextAnswer"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Cevabınızı buraya yazın"
+        android:inputType="text"
+        android:padding="12dp"
+        android:layout_marginBottom="16dp" />
+
+    <!-- Butonlar -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center"
+        android:layout_marginTop="16dp"
+        android:weightSum="3">
 
 
-        <!-- Progress Text -->
-        <TextView
-            android:id="@+id/textViewQuestionProgress"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Soru 1 / 10"
-            android:textSize="16sp"
-            android:textColor="#0D47A1"
-            android:layout_gravity="center_horizontal"
-            android:layout_marginBottom="4dp"/>
-
-        <!-- ProgressBar -->
-        <ProgressBar
-            android:id="@+id/progressBar"
-            style="?android:attr/progressBarStyleHorizontal"
-            android:layout_width="match_parent"
-            android:layout_height="20dp"
-            android:max="100"
-            android:progress="30"
-            android:scaleY="3"
-            android:progressTint="#0D47A1"
-            android:backgroundTint="#E1BEE7"
-            android:layout_marginBottom="16dp"
-            android:clipToOutline="true" />
-
-        />
-
-
-        <TextView
-            android:id="@+id/textViewScrambledWord"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Karışık Harf: artna"
-            android:textSize="20sp"
-            android:textStyle="bold"
-            android:padding="16dp" />
-        <ImageView
-            android:id="@+id/imageViewWord"
-            android:layout_width="match_parent"
-            android:layout_height="200dp"
-            android:scaleType="fitCenter"
-            android:visibility="invisible"
-            android:layout_marginBottom="16dp"/>
-        <EditText
-            android:id="@+id/editTextAnswer"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:hint="Cevabınızı buraya yazın"
-            android:inputType="text"
-            android:padding="12dp" />
-
-        <Button
-            android:id="@+id/buttonCheck"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Kontrol Et"
-            android:layout_marginTop="16dp"/>
         <Button
             android:id="@+id/buttonFinish"
-            android:layout_width="wrap_content"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:text="Bitir"
-            android:layout_marginTop="16dp"/>
+            android:layout_weight="1"
+            android:layout_marginRight="5dp"
+            android:text="Bitir" />
 
-        <TextView
-            android:id="@+id/textViewResult"
-            android:layout_width="wrap_content"
+        <Button
+            android:id="@+id/buttonNext"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:text=""
-            android:textColor="@android:color/holo_green_dark"
-            android:textSize="18sp"
-            android:layout_marginTop="12dp"/>
+            android:layout_marginRight="5dp"
+            android:layout_marginLeft="5dp"
+            android:layout_weight="1"
+            android:text="Boş Bırak" />
+        <Button
+            android:id="@+id/buttonCheck"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginRight="5dp"
+            android:layout_weight="1"
+            android:text="Kontrol Et" />
     </LinearLayout>
 
+    <!-- Sonuç Mesajı -->
+    <TextView
+        android:id="@+id/textViewResult"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text=""
+        android:textColor="@android:color/holo_green_dark"
+        android:textSize="18sp"
+        android:layout_marginTop="12dp"
+        android:gravity="center_horizontal" />
 
-</FrameLayout>
+</LinearLayout>

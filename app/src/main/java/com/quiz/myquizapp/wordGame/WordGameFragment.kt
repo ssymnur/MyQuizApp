@@ -21,6 +21,7 @@ import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
 import com.quiz.myquizapp.R
 import com.quiz.myquizapp.databinding.FragmentWordGameBinding
+import com.quiz.myquizapp.questions.QuestionsFragmentDirections
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 import retrofit2.Retrofit
@@ -32,6 +33,7 @@ class WordGameFragment : Fragment() {
     private var _binding: FragmentWordGameBinding? = null
     private val binding get() = _binding!!
 
+    private val userAnswers = mutableListOf<String?>()
     private val viewModel: WordViewModel by viewModels()
     private val args: WordGameFragmentArgs by navArgs()
 
@@ -62,8 +64,8 @@ class WordGameFragment : Fragment() {
             if (currentIndex >= wordList.size) return@setOnClickListener
 
             val userAnswer = normalizeText(binding.editTextAnswer.text.toString())
+            userAnswers.add(userAnswer)
             val correctAnswer = normalizeText(wordList[currentIndex].answer)
-
 
             if (userAnswer == correctAnswer) {
                 correctCount++
@@ -72,42 +74,61 @@ class WordGameFragment : Fragment() {
                 binding.textViewResult.text = "❌ Yanlış! Doğru cevap: $correctAnswer"
             }
 
-            // ✅ Cevabı gösterdikten sonra butonu devre dışı bırakıyoruz ki tekrar basılmasın
             binding.buttonCheck.isEnabled = false
 
-            // ⏱️ 2 saniye (veya 5 saniye) bekledikten sonra sonraki soruya geç
             binding.root.postDelayed({
                 currentIndex++
 
                 if (currentIndex < wordList.size) {
                     displayCurrentWord()
-                    binding.buttonCheck.isEnabled = true  // butonu tekrar aktif et
+                    binding.buttonCheck.isEnabled = true
                 } else {
                     if (::countDownTimer.isInitialized) countDownTimer.cancel()
-                    showResultDialog()
+                    finishGame()
                 }
-            }, 2000) // 5000 ms = 5 saniye
+            }, 2000)
 
             binding.editTextAnswer.text.clear()
         }
 
         binding.buttonFinish.setOnClickListener {
-            val action = WordGameFragmentDirections.actionWordGameFragmentToListFragment(false)
-            findNavController().navigate(action)
+            AlertDialog.Builder(requireContext())
+                .setTitle("Oyunu Bitir")
+                .setMessage("Oyunu bitirmek istediğine emin misin?")
+                .setPositiveButton("Evet") { _, _ ->
+                    val action = WordGameFragmentDirections.actionWordGameFragmentToListFragment(false)
+                    findNavController().navigate(action)
+                }
+                .setNegativeButton("Oyuna devam et") { dialog, _ -> dialog.dismiss() }
+                .show()
         }
 
+        binding.buttonNext.setOnClickListener {
+            if (currentIndex >= wordList.size) return@setOnClickListener
+            userAnswers.add(null)
+            currentIndex++
 
+            if (currentIndex < wordList.size) {
+                displayCurrentWord()
+                binding.buttonCheck.isEnabled = true
+            } else {
+                if (::countDownTimer.isInitialized) countDownTimer.cancel()
+                finishGame()
+            }
 
+            binding.editTextAnswer.text.clear()
+        }
     }
 
     private fun setTimeByLevel() {
-        timeLeftInMillis = when (level.lowercase()) {
-            "easy", "kolay" -> 10 * 60 * 1000
-            "medium", "orta" -> 5 * 60 * 1000
-            "hard", "zor" -> 10 * 60 * 1000
+        timeLeftInMillis = when (level) {
+            "easy" -> 10 * 60 * 1000
+            "medium" -> 5 * 60 * 1000
+            "hard" -> 10 * 60 * 1000
             else -> 10 * 60 * 1000
         }
     }
+
 
     private fun fetchWords() {
         val category = WordCategory.fromDisplayName(categoryName)
@@ -120,16 +141,17 @@ class WordGameFragment : Fragment() {
         lifecycleScope.launch {
             try {
                 val allWords = service.getWords(category.url).words
-                wordList = when (level.lowercase()) {
-                    "easy", "kolay" -> allWords.shuffled().take(10)
-                    "medium", "orta" -> allWords.shuffled().take(15)
-                    "hard", "zor" -> allWords.shuffled().take(20)
+                wordList = when (level) {
+                    "easy" -> allWords.shuffled().take(10)
+                    "medium" -> allWords.shuffled().take(15)
+                    "hard" -> allWords.shuffled().take(20)
                     else -> allWords.shuffled().take(10)
                 }
 
+
                 currentIndex = 0
                 displayCurrentWord()
-                startTimer()  // Timer başlatılıyor
+                startTimer()
             } catch (e: Exception) {
                 Toast.makeText(requireContext(), "Veri alınamadı: ${e.message}", Toast.LENGTH_SHORT).show()
             }
@@ -142,7 +164,6 @@ class WordGameFragment : Fragment() {
         binding.textViewResult.text = ""
         binding.editTextAnswer.text.clear()
 
-        // Resmi yükle
         if (!current.image.isNullOrEmpty()) {
             binding.imageViewWord.visibility = View.VISIBLE
             Glide.with(requireContext()).load(current.image).into(binding.imageViewWord)
@@ -150,7 +171,6 @@ class WordGameFragment : Fragment() {
             binding.imageViewWord.setImageResource(R.drawable.questionmark)
         }
 
-        // 🔄 İlerleme göstergesini güncelle
         val total = wordList.size
         val currentNumber = currentIndex + 1
         binding.textViewQuestionProgress.text = "$currentNumber/$total"
@@ -158,7 +178,6 @@ class WordGameFragment : Fragment() {
         val progressPercent = (currentNumber.toFloat() / total.toFloat()) * 100
         binding.progressBar.progress = progressPercent.toInt()
     }
-
 
     private fun startTimer() {
         countDownTimer = object : CountDownTimer(timeLeftInMillis, 1000) {
@@ -173,7 +192,7 @@ class WordGameFragment : Fragment() {
             }
 
             override fun onFinish() {
-                showResultDialog()
+                finishGame()
             }
         }.start()
     }
@@ -189,49 +208,75 @@ class WordGameFragment : Fragment() {
         binding.textViewTimer.startAnimation(blinkAnim)
     }
 
-    private fun showResultDialog() {
-        val minCorrect = when (level.lowercase()) {
-            "easy", "kolay", "medium", "orta" -> 6
-            "hard", "zor" -> 10
+    private fun finishGame() {
+        val minCorrect = when (level) {
+            "easy" -> 6
+            "medium" -> 9
+            "hard" -> 14
             else -> 6
         }
-
         val isSuccess = correctCount >= minCorrect
+        showResultDialog(correctCount, isSuccess)
+    }
 
-        val pointEarned = when (level.lowercase()) {
-            "easy", "kolay" -> 1
-            "medium", "orta" -> 2
-            "hard", "zor" -> 3
-            else -> 1
-        }
+    private fun showResultDialog(correctCount: Int, isSuccess: Boolean) {
+        if (!isAdded) return
 
+        val total = wordList.size
         val view = LayoutInflater.from(requireContext()).inflate(R.layout.dialog_result, null)
-        val img = view.findViewById<ImageView>(R.id.imageResult)
-        val text = view.findViewById<TextView>(R.id.textResultMessage)
+
+        val imageResult = view.findViewById<ImageView>(R.id.imageResult)
+        val textResultMessage = view.findViewById<TextView>(R.id.textResultMessage)
 
         if (isSuccess) {
-            img.setImageResource(R.drawable.balloon)
-            text.text = "Tebrikler! ${wordList.size} sorudan $correctCount tanesini doğru bildin 🎉"
+            imageResult.setImageResource(R.drawable.balloon)
+            textResultMessage.text = "Tebrikler! $total sorudan $correctCount tanesini doğru cevapladınız 🎉"
         } else {
-            img.setImageResource(R.drawable.sad)
-            text.text = "Üzgünüm! ${wordList.size} sorudan sadece $correctCount tanesini doğru yaptın 🙁"
+            imageResult.setImageResource(R.drawable.sad)
+            textResultMessage.text = "Daha iyisini yapabilirsin! $total sorudan sadece $correctCount doğru 🙁"
         }
 
         AlertDialog.Builder(requireContext())
             .setView(view)
             .setPositiveButton("Kategoriye Dön") { _, _ ->
                 if (isSuccess) {
-                    updateUserScoreInFirestore(pointEarned) { leveledUp ->
-                        val action = WordGameFragmentDirections.actionWordGameFragmentToListFragment(leveledUp)
-                        findNavController().navigate(action)
+                    updateUserScoreInFirestore(1) { leveledUp ->
+                        if (isAdded) {
+                            val action = QuestionsFragmentDirections.actionQuestionsFragmentToListFragment(leveledUp)
+                            findNavController().navigate(action)
+                        }
                     }
                 } else {
                     requireActivity().onBackPressedDispatcher.onBackPressed()
                 }
             }
+            .setNeutralButton("Cevapları Göster") { _, _ ->
+                showAnswersDialog()
+            }
             .setCancelable(false)
             .create()
             .show()
+    }
+
+    private fun showAnswersDialog() {
+        val builder = AlertDialog.Builder(requireContext())
+        builder.setTitle("Sorular ve Cevaplar")
+
+        val message = StringBuilder()
+
+        for ((index, question) in wordList.withIndex()) {
+            val correctAnswer = question.answer
+            val userAnswer = userAnswers.getOrNull(index) ?: "Boş bırakıldı"
+            val isCorrect = normalizeText(userAnswer) == normalizeText(correctAnswer)
+
+            message.append("🔹 Soru ${index + 1}: ${question.question}\n")
+            message.append("✔️ Doğru Cevap: $correctAnswer\n")
+            message.append("🧍 Senin Cevabın: $userAnswer ${if (isCorrect) "✅" else "❌"}\n\n")
+        }
+
+        builder.setMessage(message.toString())
+        builder.setPositiveButton("Kapat") { dialog, _ -> dialog.dismiss() }
+        builder.show()
     }
 
     private fun updateUserScoreInFirestore(points: Int, onComplete: (Boolean) -> Unit) {
@@ -270,7 +315,6 @@ class WordGameFragment : Fragment() {
             .replace("ş", "s")
             .replace("ü", "u")
     }
-
 
     override fun onDestroyView() {
         if (::countDownTimer.isInitialized) {

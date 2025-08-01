@@ -95,7 +95,18 @@ class QuestionsFragment : Fragment() {
             }
         }
 
-        binding.buttonFinish.setOnClickListener { finishQuiz() }
+        binding.buttonFinish.setOnClickListener {
+            AlertDialog.Builder(requireContext())
+                .setTitle("Oyunu Bitir")
+                .setMessage("Oyunu bitirmek istediğine emin misin?")
+                .setPositiveButton("Evet") { _, _ ->
+                    finishQuiz()
+                }
+                .setNegativeButton("Hayır") { dialog, _ ->
+                    dialog.dismiss()
+                }
+                .show()
+        }
 
         viewModel.error.observe(viewLifecycleOwner) { errorMsg ->
             Toast.makeText(requireContext(), "Hata: $errorMsg", Toast.LENGTH_SHORT).show()
