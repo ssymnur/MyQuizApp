@@ -54,6 +54,8 @@ class WordGameFragment : Fragment() {
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        val lottieFeedback = binding.lottieFeedback
+
         level = args.difficultyLevel
         categoryName = args.category
 
@@ -70,13 +72,25 @@ class WordGameFragment : Fragment() {
             if (userAnswer == correctAnswer) {
                 correctCount++
                 binding.textViewResult.text = "✅ Doğru!"
+
+                lottieFeedback.setAnimation("like.json")
+                lottieFeedback.visibility = View.VISIBLE
+                lottieFeedback.playAnimation()
             } else {
                 binding.textViewResult.text = "❌ Yanlış! Doğru cevap: $correctAnswer"
+
+                lottieFeedback.setAnimation("error.json")
+                lottieFeedback.visibility = View.VISIBLE
+                lottieFeedback.playAnimation()
             }
+
 
             binding.buttonCheck.isEnabled = false
 
             binding.root.postDelayed({
+                lottieFeedback.cancelAnimation()
+                lottieFeedback.visibility = View.GONE
+
                 currentIndex++
 
                 if (currentIndex < wordList.size) {
